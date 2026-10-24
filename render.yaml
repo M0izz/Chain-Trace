@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: chaintrace-api
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.10.0
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+      - key: DB_PATH
+        value: chaintrace.db
+      - key: API_KEY
+        value: phase3-secret-key

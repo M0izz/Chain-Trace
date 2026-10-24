@@ -7,28 +7,24 @@
   <meta name="description" content="Trace cross-chain transactions through verifiable evidence, explicit trust assumptions, and dependency-aware revalidation.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;450;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/styles.css">
   <!-- GSAP for choreographed scientific motion and scroll storytelling -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 </head>
-<body class="theme-obsidian">
-  <!-- Sticky Global Navigation -->
+<body>
+  <!-- ========================================================================
+       FLOATING TRANSLUCENT NAVIGATION
+       ======================================================================== -->
   <header class="site-header" role="banner">
     <div class="header-inner">
       <a href="#hero" class="brand-link" aria-label="ChainTrace Home">
         <div class="brand-symbol" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
-            <rect width="28" height="28" rx="7" fill="url(#brandGrad)" />
-            <path d="M7 14L12 9L17 14L22 9" stroke="#04101e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M7 19L12 14L17 19L22 14" stroke="#04101e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-            <defs>
-              <linearGradient id="brandGrad" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#00f2fe"/>
-                <stop offset="1" stop-color="#38bdf8"/>
-              </linearGradient>
-            </defs>
+          <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+            <rect width="28" height="28" rx="8" fill="#784AFF" />
+            <path d="M7 14L12 9L17 14L22 9" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 19L12 14L17 19L22 14" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
         <div class="brand-text">
@@ -39,14 +35,14 @@
 
       <nav class="site-nav" role="navigation" aria-label="Main Navigation">
         <a href="#the-problem" class="nav-link">The Problem</a>
-        <a href="#evidence-path" class="nav-link">Evidence Path</a>
-        <a href="#revalidation-differentiator" class="nav-link">Revalidation Engine</a>
+        <a href="#evidence-path" class="nav-link">Verification Path</a>
+        <a href="#revalidation" class="nav-link">Revalidation Engine</a>
         <a href="#explorer" class="nav-link">Explorer</a>
-        <a href="#trust-model" class="nav-link">Trust Assumptions</a>
+        <a href="#trust-model" class="nav-link">Trust Boundaries</a>
       </nav>
 
       <div class="header-actions">
-        <div class="profile-badge" title="Supported Protocol Profile">
+        <div class="profile-badge" title="Active Supported Protocol">
           <span class="badge-dot pulse"></span>
           <span>Sepolia ➔ Amoy (LZv2)</span>
         </div>
@@ -57,570 +53,400 @@
 
   <main id="mainContent" role="main">
     <!-- ========================================================================
-         01. CINEMATIC ABSTRACT HERO
+         01. CINEMATIC LIGHT EDITORIAL HERO
          ======================================================================== -->
     <section id="hero" class="hero-section" aria-label="ChainTrace Hero">
-      <!-- Background Abstract Particle & Evidence Lattice Canvas -->
       <canvas id="heroCanvas" class="hero-canvas" aria-hidden="true"></canvas>
-
-      <div class="hero-overlay"></div>
 
       <div class="hero-content">
         <div class="hero-overline gsap-reveal">
-          <span class="overline-tag">CROSS-CHAIN VERIFICATION INFRASTRUCTURE</span>
+          <span class="overline-tag">Cross-Chain Verification Infrastructure</span>
           <span class="overline-separator">•</span>
-          <span class="overline-meta">LAYERZERO V2 • SEPOLIA TO AMOY</span>
+          <span class="overline-meta">LayerZero v2 Endpoint Profile</span>
         </div>
 
         <h1 class="hero-title gsap-reveal">
           Follow the evidence.<br>
-          <span class="text-gradient">Not just the transaction.</span>
+          <span class="hero-title-accent">Not just the transaction.</span>
         </h1>
 
         <p class="hero-description gsap-reveal">
-          Trace cross-chain execution through verifiable observations, explicit trust assumptions, and dependency-aware revalidation. When upstream proofs reorganize, ChainTrace isolates affected claims without erasing historical facts.
+          Trace cross-chain execution through verifiable evidence, explicit trust assumptions, and dependency-aware revalidation. When supporting evidence changes, ChainTrace isolates affected claims without erasing historical facts.
         </p>
 
         <div class="hero-cta-group gsap-reveal">
           <a href="#explorer" class="btn btn-primary btn-lg">
             <span>Explore a Transaction</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
           </a>
-          <a href="#the-problem" class="btn btn-ghost btn-lg">
+          <a href="#the-problem" class="btn btn-secondary btn-lg">
             <span>Explore the Verification Model</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>
           </a>
         </div>
 
-        <!-- Hero Metric Bar -->
         <div class="hero-metrics-bar gsap-reveal">
           <div class="metric-item">
             <span class="metric-val mono">100%</span>
             <span class="metric-label">Deterministic DAG Evaluation</span>
           </div>
           <div class="metric-item">
-            <span class="metric-val mono">0</span>
-            <span class="metric-label">Speculative Claims Allowed</span>
+            <span class="metric-val mono">5 Types</span>
+            <span class="metric-label">Typed Relational Dependencies</span>
           </div>
           <div class="metric-item">
-            <span class="metric-val mono">SHA-256</span>
-            <span class="metric-label">Append-Only Audit Chain</span>
+            <span class="metric-val mono">Cryptographic</span>
+            <span class="metric-label">Append-Only Audit Hash Chaining</span>
           </div>
           <div class="metric-item">
             <span class="metric-val mono">Isolated</span>
-            <span class="metric-label">Revalidation Propagation</span>
+            <span class="metric-label">Reorg Impact Propagation</span>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ========================================================================
-         02. THE SCIENTIFIC NARRATIVE: THE PROBLEM
+         02. THE CROSS-CHAIN VERIFICATION PROBLEM
          ======================================================================== -->
-    <section id="the-problem" class="narrative-section" aria-label="The Verification Problem">
-      <div class="section-container">
-        <div class="narrative-header gsap-scroll-fade">
-          <span class="section-label">01 / THE FOUNDATIONAL FLAW</span>
-          <h2 class="section-heading">Existence is not execution proof.</h2>
-          <p class="section-subtext">
-            A source transaction and a destination transaction existing on respective blockchains does not, by itself, establish a valid cross-chain causal relationship.
+    <section id="the-problem" class="section-wrapper" aria-labelledby="problem-heading">
+      <div class="section-header-editorial gsap-reveal">
+        <span class="section-label">01 / The Verification Gap</span>
+        <div>
+          <h2 id="problem-heading" class="section-headline">Two transactions existing does not prove valid execution.</h2>
+          <p class="section-lead">
+            Traditional blockchain explorers display separate transaction receipts on disparate chains. However, observing a source transaction and a destination transaction does not guarantee they represent a causally connected, authenticated bridge execution.
           </p>
         </div>
-
-        <div class="scientific-comparison-grid">
-          <div class="comparison-card naive gsap-scroll-fade">
-            <div class="card-status-flag flag-warning">NAIVE ASSUMPTION</div>
-            <h3 class="card-title">Superficial Hash Matching</h3>
-            <p class="card-copy">
-              Conventional indexers see a transaction on Chain A and a transfer on Chain B. If amounts loosely align, they mark the transfer "complete". They fail to prove:
-            </p>
-            <ul class="scientific-checklist">
-              <li class="check-negative">Did the emitting contract actually execute with success status (0x1)?</li>
-              <li class="check-negative">Has the source block reached mathematical finality, or is it subject to reorg?</li>
-              <li class="check-negative">Did the destination delivery emit the exact cryptographic GUID dispatched?</li>
-            </ul>
-          </div>
-
-          <div class="comparison-card rigorous gsap-scroll-fade">
-            <div class="card-status-flag flag-verified">CHAINTRACE RIGOR</div>
-            <h3 class="card-title">Evidence-Backed Causality</h3>
-            <p class="card-copy">
-              Every status must cite verifiable evidence records evaluated under explicit policy versions. If a link cannot be independently validated, it is labeled truthfully:
-            </p>
-            <ul class="scientific-checklist">
-              <li class="check-positive">Direct JSON-RPC confirmation of execution status and event log indexes.</li>
-              <li class="check-positive">Exact confirmation depth calculation against profiled finality thresholds.</li>
-              <li class="check-positive">Cryptographic message GUID extraction and pairwise topic authentication.</li>
-            </ul>
-          </div>
-        </div>
       </div>
-    </section>
 
-    <!-- ========================================================================
-         03. THE EVIDENCE PATH
-         ======================================================================== -->
-    <section id="evidence-path" class="narrative-section bg-subtle" aria-label="The Evidence Path">
-      <div class="section-container">
-        <div class="narrative-header gsap-scroll-fade">
-          <span class="section-label">02 / PROTOCOL PROVENANCE</span>
-          <h2 class="section-heading">How evidence binds cross-chain truth.</h2>
-          <p class="section-subtext">
-            Follow the exact evidence path from the initial Sepolia emission to destination execution on Polygon Amoy through the LayerZero v2 EndpointV2 architecture.
-          </p>
-        </div>
-
-        <div class="evidence-pipeline-diagram gsap-scroll-fade">
-          <!-- Step 1: Source Emission -->
-          <div class="pipeline-node">
-            <div class="node-icon-wrapper">
-              <span class="node-num mono">01</span>
-            </div>
-            <div class="node-content">
-              <span class="node-stage mono">SOURCE CHAIN (11155111)</span>
-              <h4 class="node-title">PacketSent Event</h4>
-              <p class="node-desc">Direct observation of receipt logs from EndpointV2 (<code>0x6edc...f10f</code>). Extracts nonce, destination endpoint ID, and dispatched GUID.</p>
-              <div class="node-evidence-tag mono">RECEIPT_REFERENCE • PASS</div>
-            </div>
-          </div>
-
-          <div class="pipeline-connector" aria-hidden="true">
-            <div class="connector-line"></div>
-            <div class="connector-pulse"></div>
-          </div>
-
-          <!-- Step 2: Protocol Identity -->
-          <div class="pipeline-node">
-            <div class="node-icon-wrapper">
-              <span class="node-num mono">02</span>
-            </div>
-            <div class="node-content">
-              <span class="node-stage mono">VERIFICATION GATE</span>
-              <h4 class="node-title">Message Identity Binding</h4>
-              <p class="node-desc">Evaluates pairwise message match policy (<code>POL-MESSAGE-MATCH-1.0.0</code>). Proves destination claims refer to the identical cryptographic packet.</p>
-              <div class="node-evidence-tag mono">MESSAGE_ATTESTATION • MATCHED</div>
-            </div>
-          </div>
-
-          <div class="pipeline-connector" aria-hidden="true">
-            <div class="connector-line"></div>
-            <div class="connector-pulse"></div>
-          </div>
-
-          <!-- Step 3: Destination Execution -->
-          <div class="pipeline-node">
-            <div class="node-icon-wrapper">
-              <span class="node-num mono">03</span>
-            </div>
-            <div class="node-content">
-              <span class="node-stage mono">DESTINATION CHAIN (80002)</span>
-              <h4 class="node-title">PacketDelivered Receipt</h4>
-              <p class="node-desc">Observed execution on Polygon Amoy. Independent fact: even if upstream reorganizes, this execution objectively occurred on Amoy.</p>
-              <div class="node-evidence-tag mono">RECEIPT_REFERENCE • CONFIRMED</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================================================
-         04. THE DIFFERENTIATOR: DEPENDENCY-AWARE REVALIDATION
-         ======================================================================== -->
-    <section id="revalidation-differentiator" class="narrative-section" aria-label="Revalidation Differentiator">
-      <div class="section-container">
-        <div class="narrative-header gsap-scroll-fade">
-          <span class="section-label">03 / DEPENDENCY INTELLIGENCE</span>
-          <h2 class="section-heading">Revalidation without erasure.</h2>
-          <p class="section-subtext">
-            When a blockchain reorganizes or evidence changes, naive systems either delete records or falsely invalidate independent destination facts. ChainTrace propagates revalidation strictly across affected descendants.
-          </p>
-        </div>
-
-        <div class="differentiator-grid gsap-scroll-fade">
-          <div class="diff-card">
-            <div class="diff-header">
-              <span class="diff-icon">⚡</span>
-              <h4>1. Directed Acyclic Graph</h4>
-            </div>
-            <p>Claims and evidence form an acyclic dependency graph. Invariant checkers enforce cycle rejection at write time so causality is strictly ordered.</p>
-          </div>
-
-          <div class="diff-card">
-            <div class="diff-header">
-              <span class="diff-icon">🎯</span>
-              <h4>2. Isolated Descendant Invalidation</h4>
-            </div>
-            <p>If block #5,420,052 mutates its block hash, only the <code>SOURCE_FINALIZED</code> and downstream <code>MESSAGE_MATCHED</code> claims transition to <code>REVALIDATION_REQUIRED</code>.</p>
-          </div>
-
-          <div class="diff-card">
-            <div class="diff-header">
-              <span class="diff-icon">🛡️</span>
-              <h4>3. Destination Fact Preservation</h4>
-            </div>
-            <p>The destination transaction on Polygon Amoy is an immutable historical observation. It is never rewritten or labeled invalid simply because its causal origin is uncertain.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================================================
-         05. INTERACTIVE EXPLORER & DEMO WORKSPACE
-         ======================================================================== -->
-    <section id="explorer" class="explorer-section" aria-label="Interactive Transaction Explorer">
-      <div class="section-container">
-        <div class="explorer-headline-row">
+      <div class="problem-grid">
+        <div class="editorial-card gsap-reveal">
           <div>
-            <span class="section-label">04 / INTERACTIVE VERIFICATION WORKSPACE</span>
-            <h2 class="section-heading">Inspect a live or simulated trail.</h2>
+            <div class="card-num">SCENARIO A • NAIVE CORRELATION</div>
+            <h3 class="card-title">The "Look-alike" Transaction Fallacy</h3>
+            <p class="card-body">
+              An application monitors an event on Ethereum and observes an execution on Polygon. Without authenticating the message GUID, payload digest, and DVN quorum attestation, the application is vulnerable to rogue replays, mismatched parameters, and spoofed bridge calls.
+            </p>
           </div>
-          <div class="api-health-chip" id="apiStatusBadge">
-            <span class="status-indicator"></span>
-            <span class="status-text">Fastify API Connected</span>
-          </div>
-        </div>
-
-        <!-- Transaction Query Bar -->
-        <div class="card explorer-control-card">
-          <div class="lookup-form-row">
-            <div class="form-group chain-group">
-              <label for="chainSelect" class="form-label">Source Chain</label>
-              <select id="chainSelect" class="form-select">
-                <option value="11155111" selected>Ethereum Sepolia (11155111)</option>
-              </select>
-            </div>
-
-            <div class="form-group tx-group">
-              <label for="txInput" class="form-label">Source Transaction Hash</label>
-              <div class="input-with-action">
-                <input
-                  type="text"
-                  id="txInput"
-                  class="form-input mono"
-                  placeholder="0x9a8f4c2e6d1a8b3c5e7f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d"
-                  value="0x9a8f4c2e6d1a8b3c5e7f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d"
-                  spellcheck="false"
-                  autocomplete="off"
-                  aria-describedby="txValidationMsg"
-                />
-                <button id="clearTxBtn" class="input-clear-btn" title="Clear input" aria-label="Clear transaction hash">&times;</button>
-              </div>
-              <div id="txValidationMsg" class="form-feedback" aria-live="polite"></div>
-            </div>
-
-            <div class="form-group action-group">
-              <label class="form-label">&nbsp;</label>
-              <button id="inspectBtn" class="btn btn-primary" type="button">
-                <span class="btn-spinner" aria-hidden="true"></span>
-                <span class="btn-label">Inspect Trail</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Scenario Switchers with Truthful Labeling -->
-          <div class="scenario-bar">
-            <span class="scenario-label">Reproducible Scenarios:</span>
-            <div class="scenario-buttons" role="group" aria-label="Demo Scenarios">
-              <button class="pill-btn active" data-scenario="successful-trail" title="Real Sepolia -> Polygon Amoy verified trail">
-                <span class="badge-indicator pass"></span> 1. Verified Trail (Live)
-              </button>
-              <button class="pill-btn" data-scenario="message-mismatch" title="Simulate contradictory message GUIDs">
-                <span class="badge-indicator fail"></span> 2. Message Mismatch [FIXTURE]
-              </button>
-              <button class="pill-btn" data-scenario="evidence-unavailable" title="Simulate pending destination log indexing">
-                <span class="badge-indicator inconcl"></span> 3. Inflight Inconclusive [FIXTURE]
-              </button>
-              <button class="pill-btn" data-scenario="dependency-change" title="Simulate upstream block reorganization and revalidation">
-                <span class="badge-indicator reval"></span> 4. Upstream Reorg [FIXTURE]
-              </button>
-            </div>
+          <div class="visual-equation">
+            <span>Source Tx [0x1] + Dest Tx [0x2]</span>
+            <span class="eq-fail">≠ PROVEN EXECUTION</span>
           </div>
         </div>
 
-        <!-- Alert & Notification Banners -->
-        <div id="alertBanner" class="alert-banner" role="alert" style="display: none;">
-          <div class="alert-icon" id="alertIcon"></div>
-          <div class="alert-content">
-            <h4 id="alertTitle" class="alert-title"></h4>
-            <p id="alertMessage" class="alert-desc"></p>
+        <div class="editorial-card gsap-reveal">
+          <div>
+            <div class="card-num">SCENARIO B • VERIFIABLE TRAIL</div>
+            <h3 class="card-title">ChainTrace Causal Verification</h3>
+            <p class="card-body">
+              ChainTrace builds a directed acyclic graph connecting verified observations: source finality proofs, cryptographic GUID matching across Endpoint contracts, payload hash invariance, and destination delivery receipts with explicit evaluation timestamps.
+            </p>
           </div>
-          <button id="alertCloseBtn" class="alert-close" aria-label="Close notification">&times;</button>
+          <div class="visual-equation">
+            <span>PacketSent(GUID) ──AUTHENTICATES──➔ PacketDelivered(GUID)</span>
+            <span class="eq-pass">= VERIFIED TRAIL</span>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <div id="fixtureBanner" class="fixture-banner" style="display: none;" role="note">
-          <span class="fixture-tag">DEMO FIXTURE MODE</span>
-          <span>This scenario is an explicitly labeled demo fixture for state machine evaluation. It is not presented as live unverified chain data.</span>
+    <!-- ========================================================================
+         03. THE THREE-STAGE VERIFICATION TRAIL
+         ======================================================================== -->
+    <section id="evidence-path" class="section-wrapper" aria-labelledby="path-heading">
+      <div class="section-header-editorial gsap-reveal">
+        <span class="section-label">02 / The Evidence Path</span>
+        <div>
+          <h2 id="path-heading" class="section-headline">From source observation to destination execution.</h2>
+          <p class="section-lead">
+            Each step in the cross-chain lifecycle is anchored by immutable cryptographic observations, versioned verification policies, and transparent trust boundaries.
+          </p>
         </div>
+      </div>
 
-        <!-- Trail Overview Card -->
-        <div id="trailOverviewCard" class="card trail-overview-card" aria-label="Trail Summary">
-          <div class="overview-header">
-            <div class="trail-id-container">
-              <span class="meta-label">TRAIL IDENTIFIER</span>
-              <div class="copyable-row">
-                <span id="trailIdDisplay" class="mono trail-id-text">Loading...</span>
-                <button id="copyTrailIdBtn" class="icon-btn" title="Copy Trail ID" aria-label="Copy Trail ID">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                </button>
-              </div>
-            </div>
-
-            <div class="overview-status-container">
-              <span class="meta-label">OVERALL STATUS</span>
-              <div id="overallStatusBadge" class="status-badge-lg status-unverified">
-                <span class="status-icon" aria-hidden="true">●</span>
-                <span id="overallStatusText" class="status-label">UNVERIFIED</span>
-              </div>
-            </div>
-
-            <div class="overview-actions">
-              <button id="refreshBtn" class="btn btn-secondary btn-sm" title="Re-evaluate trail against fresh RPC state">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-                Revalidate Trail
-              </button>
-            </div>
+      <div class="pipeline-flow">
+        <div class="pipeline-step gsap-reveal">
+          <div class="step-connector"></div>
+          <div class="step-header">
+            <span class="step-badge">Stage 01</span>
+            <span class="mono" style="font-size: 0.75rem; color: var(--text-muted);">Sepolia (11155111)</span>
           </div>
-
-          <!-- Linear Execution Pipeline Breadcrumb -->
-          <div class="pipeline-flow" aria-label="Execution Flow">
-            <div class="flow-step" id="stepSrc">
-              <div class="step-num">1</div>
-              <div class="step-info">
-                <span class="step-title">Source Tx</span>
-                <span id="stepSrcHash" class="step-hash mono">0x...</span>
-              </div>
+          <h3 class="step-title">Source Chain Evidence</h3>
+          <p class="step-desc">
+            Captures the <code>PacketSent</code> event on LayerZero EndpointV2, extracts the 32-byte GUID, and verifies block confirmations exceed the finality threshold.
+          </p>
+          <div class="step-evidence-preview">
+            <div class="evidence-row">
+              <span class="evidence-label">Policy:</span>
+              <span class="evidence-val">policy:source-finality</span>
             </div>
-            <div class="flow-divider" aria-hidden="true">➔</div>
-            <div class="flow-step" id="stepPkt">
-              <div class="step-num">2</div>
-              <div class="step-info">
-                <span class="step-title">PacketSent</span>
-                <span id="stepPktGuid" class="step-hash mono">LayerZero v2</span>
-              </div>
+            <div class="evidence-row">
+              <span class="evidence-label">Threshold:</span>
+              <span class="evidence-val">12 Confirmations (28 Observed)</span>
             </div>
-            <div class="flow-divider" aria-hidden="true">➔</div>
-            <div class="flow-step" id="stepDest">
-              <div class="step-num">3</div>
-              <div class="step-info">
-                <span class="step-title">Destination Execution</span>
-                <span id="stepDestHash" class="step-hash mono">Pending/Confirmed</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="caveats-row">
-            <div class="trust-notice">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              <span id="trustCaveatsText">Trust Model: Direct RPC receipts & 12-block finality assumed authoritative.</span>
-            </div>
-            <div class="provenance-meta">
-              <span>Evaluated: <strong id="lastEvaluatedDisplay" class="mono">Just now</strong></span>
-              <span class="sep">•</span>
-              <span>Storage: <strong id="storageSourceDisplay">SQLite Database</strong></span>
+            <div class="evidence-row">
+              <span class="evidence-label">Status:</span>
+              <span class="evidence-val" style="color: var(--color-pass-text);">VERIFIED</span>
             </div>
           </div>
         </div>
 
-        <!-- Main Workspace Split: Left Graph & Right Inspector -->
-        <div class="workspace-grid">
-          <!-- Left Column: Dependency DAG & Claims Trail -->
-          <div class="card graph-column" aria-label="Claim Dependency Graph">
-            <div class="column-header">
-              <div class="header-left">
-                <h3 class="section-title">Claim Dependency Graph</h3>
-                <span id="claimCountBadge" class="count-badge">4 claims</span>
-              </div>
-              <div class="view-toggle" role="radiogroup" aria-label="Graph View Mode">
-                <button id="viewDagBtn" class="toggle-btn active" role="radio" aria-checked="true">Directed DAG</button>
-                <button id="viewListBtn" class="toggle-btn" role="radio" aria-checked="false">Accessible List</button>
+        <div class="pipeline-step gsap-reveal">
+          <div class="step-connector"></div>
+          <div class="step-header">
+            <span class="step-badge">Stage 02</span>
+            <span class="mono" style="font-size: 0.75rem; color: var(--text-muted);">Protocol Bridge</span>
+          </div>
+          <h3 class="step-title">Message Identity Match</h3>
+          <p class="step-desc">
+            Evaluates cryptographic identity matching. The unique <code>guid</code>, sender, nonce, and payload hash must match identically between source and destination packets.
+          </p>
+          <div class="step-evidence-preview">
+            <div class="evidence-row">
+              <span class="evidence-label">Policy:</span>
+              <span class="evidence-val">policy:message-match</span>
+            </div>
+            <div class="evidence-row">
+              <span class="evidence-label">Matching:</span>
+              <span class="evidence-val">Deterministic GUID Hash</span>
+            </div>
+            <div class="evidence-row">
+              <span class="evidence-label">Status:</span>
+              <span class="evidence-val" style="color: var(--color-pass-text);">VERIFIED</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipeline-step gsap-reveal">
+          <div class="step-header">
+            <span class="step-badge">Stage 03</span>
+            <span class="mono" style="font-size: 0.75rem; color: var(--text-muted);">Polygon Amoy (80002)</span>
+          </div>
+          <h3 class="step-title">Destination Execution</h3>
+          <p class="step-desc">
+            Inspects the destination receipt on Polygon Amoy for successful transaction status (<code>0x1</code>) and emitted <code>PacketDelivered</code> event.
+          </p>
+          <div class="step-evidence-preview">
+            <div class="evidence-row">
+              <span class="evidence-label">Policy:</span>
+              <span class="evidence-val">policy:destination-execution</span>
+            </div>
+            <div class="evidence-row">
+              <span class="evidence-label">Receipt:</span>
+              <span class="evidence-val">Status 0x1 (Confirmed)</span>
+            </div>
+            <div class="evidence-row">
+              <span class="evidence-label">Status:</span>
+              <span class="evidence-val" style="color: var(--color-pass-text);">VERIFIED</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         04. THE DIFFERENTIATOR: REVALIDATION ENGINE
+         ======================================================================== -->
+    <section id="revalidation" class="section-wrapper" aria-labelledby="reval-heading">
+      <div class="section-header-editorial gsap-reveal">
+        <span class="section-label">03 / The Differentiator</span>
+        <div>
+          <h2 id="reval-heading" class="section-headline">Dependency-Aware Revalidation</h2>
+          <p class="section-lead">
+            When upstream evidence changes (such as a source chain block reorganization or policy upgrade), ChainTrace does not blind-wipe history or mislabel transactions. It traverses descendants in the DAG and marks only dependent claims as <code>REVALIDATION_REQUIRED</code> while preserving independent historical facts.
+          </p>
+        </div>
+      </div>
+
+      <div class="revalidation-interactive-box gsap-reveal">
+        <div class="reval-top-controls">
+          <div class="reval-info">
+            <h3>Interactive Reorg Demonstration</h3>
+            <p>Trigger a controlled upstream block hash mutation to see topological change propagation in real time.</p>
+          </div>
+          <button id="btnTriggerReval" class="btn btn-secondary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+            <span>Simulate Upstream Block Reorg</span>
+          </button>
+        </div>
+
+        <div class="reval-graph-container">
+          <div id="demoNodeInclusion" class="reval-node">
+            <span class="node-status-pill verified">VERIFIED</span>
+            <div class="node-title">1. Event Inclusion</div>
+            <div class="node-meta">Sepolia Block 5,420,052</div>
+          </div>
+
+          <div id="demoNodeFinality" class="reval-node">
+            <span class="node-status-pill verified">VERIFIED</span>
+            <div class="node-title">2. Source Finality</div>
+            <div class="node-meta">Depends on [1]</div>
+          </div>
+
+          <div id="demoNodeMatch" class="reval-node">
+            <span class="node-status-pill verified">VERIFIED</span>
+            <div class="node-title">3. Message Matched</div>
+            <div class="node-meta">Depends on [2]</div>
+          </div>
+
+          <div id="demoNodeDest" class="reval-node">
+            <span class="node-status-pill verified">VERIFIED</span>
+            <div class="node-title">4. Destination Executed</div>
+            <div class="node-meta">Independent Polygon Fact</div>
+          </div>
+        </div>
+
+        <div id="revalExplanation" class="visual-equation" style="background: var(--bg-surface-subtle);">
+          <span id="revalStatusText">Initial State: All 4 claims verified under stated policies. Click "Simulate Upstream Block Reorg" above.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         05. LIVE PRODUCT EXPLORER & INVESTIGATION WORKSPACE
+         ======================================================================== -->
+    <section id="explorer" class="section-wrapper explorer-section" aria-labelledby="explorer-heading">
+      <div class="section-header-editorial gsap-reveal">
+        <span class="section-label">04 / Product Interface</span>
+        <div>
+          <h2 id="explorer-heading" class="section-headline">Cross-Chain Trail Explorer</h2>
+          <p class="section-lead">
+            Query live cross-chain transactions or inspect reproducible test scenarios. All data is evaluated against versioned verification rules and backed by the ChainTrace REST API.
+          </p>
+        </div>
+      </div>
+
+      <div class="explorer-card">
+        <!-- Toolbar & Search Form -->
+        <div class="explorer-toolbar">
+          <div class="toolbar-header">
+            <span class="toolbar-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-violet)" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              Transaction Investigation Lookup
+            </span>
+            <div class="scenario-pill-group" role="group" aria-label="Demo Scenarios">
+              <button class="scenario-pill active" data-scenario="successful-trail">1. Verified Trail</button>
+              <button class="scenario-pill" data-scenario="message-mismatch">2. Message Mismatch [FIXTURE]</button>
+              <button class="scenario-pill" data-scenario="evidence-unavailable">3. Inflight Inconclusive [FIXTURE]</button>
+              <button class="scenario-pill" data-scenario="dependency-change">4. Upstream Reorg [FIXTURE]</button>
+            </div>
+          </div>
+
+          <form id="searchForm" class="search-box-row" onsubmit="return false;">
+            <select id="chainSelect" class="chain-select" aria-label="Select Source Chain">
+              <option value="11155111" selected>Sepolia (11155111)</option>
+            </select>
+            <div class="hash-input-wrapper">
+              <input 
+                type="text" 
+                id="txHashInput" 
+                class="hash-input" 
+                value="0x9a8f4c2e6d1a8b3c5e7f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d"
+                placeholder="Enter 32-byte hexadecimal transaction hash (0x...)"
+                spellcheck="false"
+                aria-label="Transaction Hash Input"
+              >
+            </div>
+            <button type="submit" id="inspectBtn" class="btn btn-primary">Inspect Trail</button>
+          </form>
+        </div>
+
+        <!-- Fixture Banner -->
+        <div id="fixtureBanner" class="fixture-banner">
+          <span><strong>[DEMO FIXTURE MODE]</strong> This scenario demonstrates controlled verification behavior with deterministic test fixtures.</span>
+          <span class="mono">STATUS: SIMULATED SCENARIO</span>
+        </div>
+
+        <!-- Trail Summary Header -->
+        <div class="trail-summary-strip">
+          <div class="trail-meta-group">
+            <span class="trail-id-label">EVALUATED TRAIL IDENTIFIER</span>
+            <span id="trailIdEl" class="trail-id-hash mono">trail:11155111:0x9a8f4c...</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="aggregateBadgeEl" class="status-badge-lg verified">VERIFIED</span>
+            <button id="btnRefreshTrail" class="btn btn-ghost btn-sm" title="Re-evaluate trail against fresh state">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+              <span>Revalidate</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Explorer Body Grid -->
+        <div class="explorer-body-grid">
+          <!-- Left Column: DAG Graph & List Alternative -->
+          <div class="dag-column">
+            <div class="column-header-row">
+              <span class="column-title">Claim Dependency Graph (DAG)</span>
+              <div class="dag-view-toggle">
+                <button id="btnViewGraph" class="toggle-btn active" aria-label="Visual Graph View">Graph</button>
+                <button id="btnViewList" class="toggle-btn" aria-label="Accessible List View">List View</button>
               </div>
             </div>
 
-            <div id="dagContainer" class="dag-container" tabindex="0" aria-label="Interactive Claim Dependency Graph">
-              <svg id="dagSvg" class="dag-svg" width="100%" height="420" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                    <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155"/>
-                  </marker>
-                  <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                    <path d="M 0 1 L 10 5 L 0 9 z" fill="#00f2fe"/>
-                  </marker>
-                </defs>
-                <g id="dagEdges" class="edges-layer"></g>
-                <g id="dagNodes" class="nodes-layer"></g>
-              </svg>
-              <div class="dag-hint">Click nodes to inspect claims & evidence. Select edges to inspect dependency constraints.</div>
+            <!-- SVG DAG Viewport -->
+            <div id="svgDagViewport" class="svg-dag-viewport">
+              <svg id="svgDag" width="100%" height="100%" viewBox="0 0 600 380" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
 
             <!-- Accessible List Fallback -->
-            <div id="accessibleListContainer" class="list-container" style="display: none;">
-              <ul id="claimsListFallback" class="claims-list-fallback" role="list"></ul>
-            </div>
+            <ul id="claimListView" class="accessible-list-view" role="list" aria-label="Claims List"></ul>
 
-            <!-- Edge Explanation Card -->
-            <div id="edgeDetailCard" class="edge-detail-card" style="display: none;">
-              <div class="edge-title-row">
-                <span class="meta-label">DEPENDENCY RELATIONSHIP</span>
-                <span id="edgeTypeBadge" class="badge badge-accent">AUTHENTICATES</span>
-              </div>
-              <p id="edgeExplanation" class="edge-explanation-text"></p>
-            </div>
-
-            <!-- Revalidation Impact View -->
-            <div id="revalidationImpactCard" class="reval-impact-card" style="display: none;">
-              <h4 class="impact-title">Revalidation Impact Analysis</h4>
-              <p class="impact-desc">ChainTrace isolates invalidation strictly to downstream dependents without erasing historical facts:</p>
-              <div class="impact-columns">
-                <div class="impact-col affected">
-                  <span class="col-head">Affected Claims (Require Revalidation)</span>
-                  <ul id="affectedClaimsList" class="impact-list"></ul>
-                </div>
-                <div class="impact-col unaffected">
-                  <span class="col-head">Unaffected Independent Facts</span>
-                  <ul id="unaffectedClaimsList" class="impact-list"></ul>
-                </div>
+            <!-- Edge Relationship Card -->
+            <div id="edgeExplanationCard" class="detail-card" style="border-left: 3px solid var(--accent-violet);">
+              <div class="detail-title">Selected Relationship Edge</div>
+              <div id="edgeExplanationText" class="detail-val" style="font-size: 0.8125rem;">
+                Select a node or edge in the graph above to view its dependency prerequisites and verification invariants.
               </div>
             </div>
           </div>
 
-          <!-- Right Column: Detail Inspector -->
-          <div class="card inspector-column" aria-label="Investigation Inspector">
-            <div class="tab-bar" role="tablist">
-              <button id="tabClaimBtn" class="tab-btn active" role="tab" aria-selected="true" aria-controls="claimTabPanel">
-                Claim Inspector
-              </button>
-              <button id="tabEvidenceBtn" class="tab-btn" role="tab" aria-selected="false" aria-controls="evidenceTabPanel">
-                Evidence Inspector <span id="evCountBadge" class="badge badge-subtle">2</span>
-              </button>
-              <button id="tabAuditBtn" class="tab-btn" role="tab" aria-selected="false" aria-controls="auditTabPanel">
-                Audit Timeline <span id="auditCountBadge" class="badge badge-subtle">1</span>
-              </button>
-            </div>
+          <!-- Right Column: Inspector Panel -->
+          <div class="inspector-column">
+            <nav class="tab-nav" role="tablist">
+              <button id="tabClaim" class="tab-btn active" role="tab" aria-selected="true" aria-controls="panelClaim">Claim Inspector</button>
+              <button id="tabEvidence" class="tab-btn" role="tab" aria-selected="false" aria-controls="panelEvidence">Evidence Records</button>
+              <button id="tabAudit" class="tab-btn" role="tab" aria-selected="false" aria-controls="panelAudit">Audit Timeline</button>
+            </nav>
 
-            <!-- Tab 1: Claim Inspector -->
-            <div id="claimTabPanel" class="tab-panel active" role="tabpanel" aria-labelledby="tabClaimBtn">
-              <div class="panel-section">
-                <div class="section-row-between">
-                  <div>
-                    <span class="meta-label">SELECTED CLAIM</span>
-                    <h4 id="claimNameDisplay" class="claim-title-lg">Select a claim to inspect</h4>
-                  </div>
-                  <div id="claimStatusBadge" class="status-badge-md status-unverified">UNVERIFIED</div>
-                </div>
-                <div class="copyable-row">
-                  <span id="claimIdDisplay" class="mono text-muted text-sm">claim:...</span>
-                  <button id="copyClaimIdBtn" class="icon-btn" title="Copy Claim ID" aria-label="Copy Claim ID">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  </button>
-                </div>
+            <!-- Panel 1: Claim Inspector -->
+            <div id="panelClaim" class="inspector-tab-content active" role="tabpanel" aria-labelledby="tabClaim">
+              <div class="detail-card">
+                <div class="detail-title">Proposition & Claim Type</div>
+                <div id="claimTitleEl" class="detail-val" style="font-weight: 600;">Source Transaction Included</div>
+                <div id="claimIdEl" class="mono" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">claim:event-inclusion:0x9a8f4c</div>
               </div>
 
-              <div class="panel-section">
-                <span class="meta-label">STATUS REASON & EXPLANATION</span>
-                <div id="claimReasonBox" class="reason-callout">
-                  <div id="claimReasonCode" class="reason-code mono">CODE_PENDING</div>
-                  <p id="claimReasonMsg" class="reason-text">Select a claim node on the left to inspect its verification output and reason codes.</p>
-                </div>
+              <div class="detail-card">
+                <div class="detail-title">Verification Rationale & Reason Code</div>
+                <div id="claimReasonEl" class="detail-val">Source transaction executed successfully with status 0x1.</div>
               </div>
 
-              <div class="panel-section">
-                <span class="meta-label">POLICY & PROVENANCE</span>
-                <div class="kv-grid">
-                  <div class="kv-item">
-                    <span class="kv-key">Policy Identifier</span>
-                    <span id="claimPolicyId" class="kv-val mono">-</span>
-                  </div>
-                  <div class="kv-item">
-                    <span class="kv-key">Policy Version</span>
-                    <span id="claimPolicyVer" class="kv-val mono">-</span>
-                  </div>
-                  <div class="kv-item">
-                    <span class="kv-key">Claim Version (OCC)</span>
-                    <span id="claimVersion" class="kv-val mono">v1</span>
-                  </div>
-                  <div class="kv-item">
-                    <span class="kv-key">Last Verified</span>
-                    <span id="claimVerifiedAt" class="kv-val mono">-</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="panel-section">
-                <span class="meta-label">SUPPORTING EVIDENCE REFERENCES</span>
-                <div id="claimEvidenceRefs" class="ref-pills-container">
-                  <span class="text-muted text-sm">No evidence loaded.</span>
-                </div>
+              <div class="detail-card">
+                <div class="detail-title">Applied Policy & Version</div>
+                <div id="claimPolicyEl" class="detail-val mono" style="font-size: 0.8125rem;">policy:event-inclusion (v1.0.0)</div>
               </div>
             </div>
 
-            <!-- Tab 2: Evidence Inspector -->
-            <div id="evidenceTabPanel" class="tab-panel" role="tabpanel" aria-labelledby="tabEvidenceBtn" style="display: none;">
-              <div class="panel-section">
-                <span class="meta-label">AVAILABLE EVIDENCE RECORDS</span>
-                <div id="evidenceSelectorList" class="evidence-selector-list"></div>
+            <!-- Panel 2: Evidence Records -->
+            <div id="panelEvidence" class="inspector-tab-content" role="tabpanel" aria-labelledby="tabEvidence">
+              <div class="detail-card">
+                <div class="detail-title">Evidence Provider & Method</div>
+                <div id="evidenceMethodEl" class="detail-val">DIRECT_RPC • https://rpc.sepolia.org</div>
+                <div id="evidenceHashEl" class="mono" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">SHA-256 Content Hash Verified</div>
               </div>
 
-              <div id="evidenceDetailArea" class="evidence-detail-area">
-                <div class="section-row-between">
-                  <div>
-                    <span class="meta-label">EVIDENCE RECORD</span>
-                    <h4 id="evTypeDisplay" class="ev-title">RECEIPT_REFERENCE</h4>
-                  </div>
-                  <span id="evResultBadge" class="badge badge-pass">PASS</span>
-                </div>
-
-                <div class="kv-grid mt-sm">
-                  <div class="kv-item">
-                    <span class="kv-key">Verification Method</span>
-                    <span id="evMethodDisplay" class="kv-val mono">DIRECT_RPC</span>
-                  </div>
-                  <div class="kv-item">
-                    <span class="kv-key">Evaluation Time</span>
-                    <span id="evTimestampDisplay" class="kv-val mono">-</span>
-                  </div>
-                  <div class="kv-item full-width">
-                    <span class="kv-key">Provider / Source Locator</span>
-                    <span id="evProviderDisplay" class="kv-val mono">-</span>
-                  </div>
-                  <div class="kv-item full-width">
-                    <span class="kv-key">Content Hash (SHA-256)</span>
-                    <div class="copyable-row">
-                      <span id="evHashDisplay" class="kv-val mono text-sm truncate">-</span>
-                      <button id="copyEvHashBtn" class="icon-btn" title="Copy Content Hash" aria-label="Copy Content Hash">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="panel-section mt-sm">
-                  <div class="section-row-between">
-                    <span class="meta-label">NORMALIZED OBSERVATION PAYLOAD</span>
-                    <button id="toggleRawPayloadBtn" class="btn btn-subtle btn-xs">View Raw JSON</button>
-                  </div>
-                  <pre id="evPayloadDisplay" class="code-block mono text-xs">{}</pre>
-                </div>
+              <div class="detail-card">
+                <div class="detail-title">Normalized Observation Payload</div>
+                <pre id="evidenceRawEl" class="code-preview-block">{\n  "status": 1,\n  "confirmations": 28,\n  "blockNumber": 5420052\n}</pre>
               </div>
             </div>
 
-            <!-- Tab 3: Audit Timeline -->
-            <div id="auditTabPanel" class="tab-panel" role="tabpanel" aria-labelledby="tabAuditBtn" style="display: none;">
-              <div class="panel-section">
-                <div class="section-row-between">
-                  <div>
-                    <span class="meta-label">APPEND-ONLY AUDIT HISTORY</span>
-                    <p class="text-sm text-muted">Cryptographically chained transitions explaining each state change.</p>
-                  </div>
-                  <div class="audit-pagination-controls">
-                    <button id="auditPrevBtn" class="btn btn-secondary btn-xs" disabled>&larr; Newer</button>
-                    <span id="auditPageDisplay" class="text-xs text-muted">1 of 1</span>
-                    <button id="auditNextBtn" class="btn btn-secondary btn-xs" disabled>Older &rarr;</button>
-                  </div>
-                </div>
-              </div>
-
-              <div id="auditTimelineContainer" class="audit-timeline-container">
-                <div id="auditTimelineList" class="audit-timeline"></div>
+            <!-- Panel 3: Append-Only Audit Timeline -->
+            <div id="panelAudit" class="inspector-tab-content" role="tabpanel" aria-labelledby="tabAudit">
+              <div id="auditTimelineContainer" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 480px; overflow-y: auto;">
+                <!-- Audit items injected dynamically by app.js -->
               </div>
             </div>
           </div>
@@ -629,123 +455,94 @@
     </section>
 
     <!-- ========================================================================
-         06. TRUST MODEL & TECHNICAL SPECIFICATIONS
+         06. TRUST ASSUMPTIONS & PROTOCOL LIMITS
          ======================================================================== -->
-    <section id="trust-model" class="narrative-section bg-subtle" aria-label="Technical Foundation & Limitations">
-      <div class="section-container">
-        <div class="narrative-header gsap-scroll-fade">
-          <span class="section-label">05 / TRUST BOUNDARIES</span>
-          <h2 class="section-heading">Explicit assumptions. No hidden trust.</h2>
-          <p class="section-subtext">
-            Scientific verification requires disclosing what is assumed versus what is independently proved. ChainTrace never claims trustless consensus without qualification.
+    <section id="trust-model" class="section-wrapper" aria-labelledby="trust-heading">
+      <div class="section-header-editorial gsap-reveal">
+        <span class="section-label">05 / Explicit Boundaries</span>
+        <div>
+          <h2 id="trust-heading" class="section-headline">Transparent Trust Model</h2>
+          <p class="section-lead">
+            ChainTrace avoids false claims of trustless verification. Every claim records its precise verification assumptions, observation sources, and explicit protocol boundaries.
           </p>
-        </div>
-
-        <div class="trust-grid gsap-scroll-fade">
-          <div class="trust-item">
-            <span class="trust-pill mono">ASSUMPTION 01</span>
-            <h4>RPC Provider Honesty</h4>
-            <p>Verification results trust the observed Ethereum Sepolia and Polygon Amoy RPC nodes for raw receipt fields and logs. Content hashes detect post-facto modification of stored records, not provider fraud at ingestion.</p>
-          </div>
-
-          <div class="trust-item">
-            <span class="trust-pill mono">ASSUMPTION 02</span>
-            <h4>12-Block Finality Guard</h4>
-            <p>Sepolia transactions with 12 or more confirmations are modeled as non-reorganizable. If a deeper chain reorganization occurs, the system records it as an anomalous state transition via the audit trail.</p>
-          </div>
-
-          <div class="trust-item">
-            <span class="trust-pill mono">ASSUMPTION 03</span>
-            <h4>LayerZero DVN Quorum</h4>
-            <p>The system verifies that the LayerZero EndpointV2 contract on Polygon Amoy emitted <code>PacketDelivered</code> with matching GUID. It does not re-execute internal DVN threshold multisig off-chain.</p>
-          </div>
-
-          <div class="trust-item">
-            <span class="trust-pill mono">ASSUMPTION 04</span>
-            <h4>Append-Only Immutability</h4>
-            <p>State transitions are protected by SHA-256 hash chaining (<code>prev_hash</code> ➔ <code>record_hash</code>). Application routes cannot update or delete historical audit rows.</p>
-          </div>
         </div>
       </div>
-    </section>
 
-    <!-- ========================================================================
-         07. CLOSING EDITORIAL CTA
-         ======================================================================== -->
-    <section class="cta-section" aria-label="Explore ChainTrace">
-      <div class="section-container">
-        <div class="cta-box gsap-scroll-fade">
-          <span class="section-label">VERIFY WITH CONFIDENCE</span>
-          <h2 class="cta-title">Turn cross-chain uncertainty into explainable truth.</h2>
-          <p class="cta-desc">
-            Explore transactions, track protocol evidence, and observe dependency propagation across LayerZero v2.
-          </p>
-          <div class="cta-actions">
-            <a href="#explorer" class="btn btn-primary btn-lg">Trace a Transaction Now ↗</a>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-lg">View Open Source Specification</a>
+      <div class="trust-grid">
+        <div class="trust-card gsap-reveal">
+          <div class="trust-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
+          <h3 class="trust-title">RPC Provider Honesty</h3>
+          <p class="trust-desc">
+            Direct JSON-RPC observations rely on honest node responses. In production profiles, multi-provider quorum and consensus headers can be configured to eliminate single-provider trust.
+          </p>
+        </div>
+
+        <div class="trust-card gsap-reveal">
+          <div class="trust-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+          </div>
+          <h3 class="trust-title">LayerZero DVN Quorum</h3>
+          <p class="trust-desc">
+            Message verification assumes the protocol's configured Decentralized Verifier Network (DVN) has not colluded or violated signoff rules between source and destination endpoints.
+          </p>
+        </div>
+
+        <div class="trust-card gsap-reveal">
+          <div class="trust-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3 class="trust-title">Finality Thresholds</h3>
+          <p class="trust-desc">
+            Claims are verified only after meeting configured confirmation thresholds (12 blocks on Sepolia). Upstream reorganizations trigger automated <code>REVALIDATION_REQUIRED</code> transitions.
+          </p>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Revalidate Confirmation Modal -->
-  <dialog id="refreshModal" class="app-modal" aria-labelledby="modalTitle">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 id="modalTitle" class="modal-title">Trigger Trail Revalidation</h3>
-        <button id="closeModalBtn" class="modal-close" aria-label="Close modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <p class="modal-desc">
-          State-mutating refreshes re-query live RPC nodes, check for block reorganizations, and update the persistent SQLite store.
-        </p>
-        <div class="form-group mt-sm">
-          <label for="apiKeyInput" class="form-label">API Key (x-api-key)</label>
-          <input type="password" id="apiKeyInput" class="form-input mono" placeholder="Enter API Key" value="phase3-secret-key" />
-          <span class="form-help">Protected mutation endpoint. Sliding window rate-limited to 5 req/min.</span>
-        </div>
-        <div class="form-group mt-sm">
-          <label class="checkbox-label">
-            <input type="checkbox" id="checkReorgBox" checked />
-            <span>Enable block reorganization detection</span>
-          </label>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="cancelRefreshBtn" class="btn btn-secondary">Cancel</button>
-        <button id="confirmRefreshBtn" class="btn btn-primary">Execute Revalidation</button>
-      </div>
-    </div>
-  </dialog>
-
-  <!-- Editorial Footer -->
+  <!-- ========================================================================
+       07. EDITORIAL FOOTER
+       ======================================================================== -->
   <footer class="site-footer" role="contentinfo">
-    <div class="section-container footer-inner">
-      <div class="footer-left">
-        <div class="brand-row">
-          <span class="brand-name">CHAINTRACE</span>
-          <span class="badge badge-subtle">v1.0.0</span>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <h2>CHAINTRACE</h2>
+          <p>Verifiable cross-chain execution and evidence infrastructure with dependency-aware revalidation and append-only audit provenance.</p>
         </div>
-        <p class="footer-note">A verifiable cross-chain transaction graph with evidence dependencies, auditable claims, and dependency-aware revalidation.</p>
+
+        <div class="footer-links">
+          <div class="footer-col">
+            <span class="footer-col-title">Documentation</span>
+            <a href="#the-problem">The Problem</a>
+            <a href="#evidence-path">Evidence Path</a>
+            <a href="#revalidation">Revalidation Engine</a>
+            <a href="#trust-model">Trust Boundaries</a>
+          </div>
+          <div class="footer-col">
+            <span class="footer-col-title">Endpoints</span>
+            <a href="/health">GET /health</a>
+            <a href="/ready">GET /ready</a>
+            <a href="#explorer">Explorer Tool</a>
+          </div>
+          <div class="footer-col">
+            <span class="footer-col-title">Repository</span>
+            <a href="https://github.com/M0izz/Chain-Trace" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://github.com/M0izz/Chain-Trace/blob/main/README.md" target="_blank" rel="noopener">Specification</a>
+          </div>
+        </div>
       </div>
-      <div class="footer-links">
-        <div class="footer-col">
-          <span class="col-title mono">SPECIFICATION</span>
-          <a href="#the-problem">Verification Model</a>
-          <a href="#evidence-path">Evidence Pipelines</a>
-          <a href="#revalidation-differentiator">Revalidation DAG</a>
-        </div>
-        <div class="footer-col">
-          <span class="col-title mono">INFRASTRUCTURE</span>
-          <a href="/health" target="_blank">Health Probe (/health)</a>
-          <a href="/ready" target="_blank">Readiness Probe (/ready)</a>
-          <a href="#trust-model">Trust Assumptions</a>
-        </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 ChainTrace Protocol Intelligence. All rights reserved.</span>
+        <span>Built for verifiable cross-chain reliability.</span>
       </div>
     </div>
   </footer>
 
-  <script type="module" src="/assets/app.js"></script>
+  <!-- Main Application Script -->
+  <script src="/assets/app.js"></script>
 </body>
 </html>

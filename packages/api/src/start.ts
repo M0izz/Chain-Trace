@@ -7,9 +7,9 @@ import { SqliteStore } from '../../persistence/src/index.js';
 import { DurableTrailService } from '../../service/src/durable-trail-service.js';
 import { buildApiServer } from './server.js';
 
-async function main() {
+export async function startServer() {
   const port = parseInt(process.env.PORT || '3000', 10);
-  const host = process.env.HOST || '127.0.0.1';
+  const host = process.env.HOST || '0.0.0.0';
   const dbPath = process.env.DB_PATH || 'chaintrace.db';
 
   const store = new SqliteStore({ dbPath });
@@ -39,22 +39,26 @@ async function main() {
   try {
     const address = await app.listen({ port, host });
     console.log(`\n======================================================`);
-    console.log(`  ChainTrace Phase 4 Explorer Online at ${address}`);
+    console.log(`  ChainTrace Server Online at ${address}`);
     console.log(`  REST API Endpoints:`);
     console.log(`   - GET  /health`);
     console.log(`   - GET  /ready`);
     console.log(`   - GET  /v1/trails/:sourceChainId/:sourceTxHash`);
     console.log(`   - GET  /v1/claims/:claimId`);
-    console.log(`   - GET  /v1/evidence/:evidenceId`);
+    console.log(`   - GET  /evidence/:evidenceId`);
     console.log(`   - GET  /v1/trails/:trailId/audit`);
     console.log(`   - POST /v1/trails/:trailId/refresh`);
     console.log(`======================================================\n`);
+    return app;
   } catch (err) {
     console.error('Failed to start ChainTrace server:', err);
     process.exit(1);
   }
 }
 
-if (process.argv[1]?.endsWith('start.js') || process.argv[1]?.endsWith('start.ts')) {
-  main();
+if (
+  process.argv[1]?.endsWith('start.js') ||
+  process.argv[1]?.endsWith('start.ts')
+) {
+  startServer();
 }

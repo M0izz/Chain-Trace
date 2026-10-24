@@ -25,10 +25,19 @@ export function buildApiServer(options: ApiServerOptions): FastifyInstance {
 
   const expectedApiKey = options.apiKey ?? process.env.API_KEY ?? 'phase3-secret-key';
 
-  // Request correlation hook
+  // Request correlation and CORS hook
   app.addHook('onRequest', async (req, reply) => {
     const correlationId = (req.headers['x-correlation-id'] as string) || req.id;
     reply.header('x-correlation-id', correlationId);
+
+    // Cross-Origin Resource Sharing for Vercel <-> Render deployment
+    reply.header('Access-Control-Allow-Origin', '*');
+    reply.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD');
+    reply.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key, idempotency-key, x-correlation-id');
+
+    if (req.method === 'OPTIONS') {
+      return reply.status(204).send();
+    }
   });
 
   // --------------------------------------------------------------------------
