@@ -242,23 +242,31 @@ export function buildApiServer(options: ApiServerOptions): FastifyInstance {
       return reply.status(404).send('UI index.html not found');
     });
 
-    app.get('/assets/styles.css', async (_req: FastifyRequest, reply: FastifyReply) => {
-      const cssPath = join(publicDir, 'styles.css');
-      if (existsSync(cssPath)) {
+    const serveCss = async (_req: FastifyRequest, reply: FastifyReply) => {
+      const candidates = [join(publicDir, 'assets', 'styles.css'), join(publicDir, 'styles.css')];
+      const cssPath = candidates.find((p) => existsSync(p));
+      if (cssPath) {
         const css = readFileSync(cssPath, 'utf-8');
         return reply.type('text/css').send(css);
       }
       return reply.status(404).send('styles.css not found');
-    });
+    };
 
-    app.get('/assets/app.js', async (_req: FastifyRequest, reply: FastifyReply) => {
-      const jsPath = join(publicDir, 'app.js');
-      if (existsSync(jsPath)) {
+    const serveJs = async (_req: FastifyRequest, reply: FastifyReply) => {
+      const candidates = [join(publicDir, 'assets', 'app.js'), join(publicDir, 'app.js')];
+      const jsPath = candidates.find((p) => existsSync(p));
+      if (jsPath) {
         const js = readFileSync(jsPath, 'utf-8');
         return reply.type('application/javascript').send(js);
       }
       return reply.status(404).send('app.js not found');
-    });
+    };
+
+    app.get('/assets/styles.css', serveCss);
+    app.get('/styles.css', serveCss);
+
+    app.get('/assets/app.js', serveJs);
+    app.get('/app.js', serveJs);
   }
 
   return app;
