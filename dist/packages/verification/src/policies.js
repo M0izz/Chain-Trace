@@ -153,6 +153,20 @@ function evaluateMessageMatchPolicy(input) {
             }
         };
     }
+    // Explicit check on message IDs match in claim metadata: mismatch is deterministically INVALID
+    if (claim.metadata) {
+        const sourceMsgId = claim.metadata.source_message_id;
+        const destMsgId = claim.metadata.destination_message_id;
+        if (sourceMsgId && destMsgId && sourceMsgId !== destMsgId) {
+            return {
+                status: 'INVALID',
+                reason: {
+                    code: 'MESSAGE_ID_MISMATCH',
+                    message: `Source message ID ${sourceMsgId} does not match destination message ID ${destMsgId}`
+                }
+            };
+        }
+    }
     // Check message attestation evidence
     const attestations = Array.from(dependencies.parentEvidence.values()).filter((ev) => ev.evidence_type === 'MESSAGE_ATTESTATION' || ev.evidence_type === 'INCLUSION_PROOF');
     if (attestations.length === 0) {
@@ -183,20 +197,6 @@ function evaluateMessageMatchPolicy(input) {
                 message: 'Message attestation is inconclusive or unconfirmed'
             }
         };
-    }
-    // Explicit check on message IDs match in claim metadata
-    if (claim.metadata) {
-        const sourceMsgId = claim.metadata.source_message_id;
-        const destMsgId = claim.metadata.destination_message_id;
-        if (sourceMsgId && destMsgId && sourceMsgId !== destMsgId) {
-            return {
-                status: 'INVALID',
-                reason: {
-                    code: 'MESSAGE_ID_MISMATCH',
-                    message: `Source message ID ${sourceMsgId} does not match destination message ID ${destMsgId}`
-                }
-            };
-        }
     }
     return {
         status: 'VERIFIED',

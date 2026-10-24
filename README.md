@@ -139,22 +139,35 @@ chaintrace/
 │       └── decision-log.md              # Architectural Decision Records (ADRs)
 │   └── phase-1/                         # Phase 1 Implementation & Acceptance
 │       └── phase-1-report.md            # Phase 1 exit gate report & test results
+│   └── phase-2/                         # Phase 2 Real Chain Integration
+│       └── phase-2-report.md            # Phase 2 implementation report & acceptance
 ├── packages/
 │   ├── domain/                          # Domain models, schemas & audit trail
 │   │   └── src/
 │   │       ├── types.ts                 # Typed schemas (Event, Evidence, Claim, Edge, Audit)
 │   │       ├── schemas.ts               # Invariant checkers & validators
 │   │       ├── audit.ts                 # Cryptographically chained append-only audit log
+│   │       ├── errors.ts                # Domain errors (NotFoundError, CycleDetectedError, etc.)
+│   │       ├── repositories.ts          # In-memory persistence repositories
 │   │       └── index.ts                 # Domain exports
 │   ├── dependency-engine/               # Core DAG and propagation engine
 │   │   └── src/
 │   │       ├── dag.ts                   # Deterministic DAG with cycle rejection
 │   │       ├── engine.ts                # DependencyEngine with propagation & revalidation
 │   │       └── index.ts                 # Engine exports
-│   └── verification/                    # Phase 1 verification policies
+│   ├── verification/                    # Phase 1 verification policies
+│   │   └── src/
+│   │       ├── policies.ts              # Event inclusion, finality, message match policies
+│   │       └── index.ts                 # Verification exports
+│   └── chain-adapters/                  # Phase 2 Real-World Protocol Adapters
 │       └── src/
-│           ├── policies.ts              # Event inclusion, finality, message match policies
-│           └── index.ts                 # Verification exports
+│           ├── profile.ts               # LayerZero v2 profile (Sepolia -> Polygon Amoy)
+│           ├── rpc-client.ts            # ReadOnlyRpcClient with retry, timeout & 429 backoff
+│           ├── decoder.ts               # PacketSent & PacketDelivered ABI decoders
+│           ├── adapter.ts               # LayerZeroV2Adapter source/dest evidence collection
+│           ├── trail-service.ts         # CrossChainTrailService (connects adapter to DAG engine)
+│           ├── errors.ts                # Typed RPC & adapter error classes
+│           └── index.ts                 # Chain adapters exports
 └── tests/
     ├── fixtures/
     │   └── deterministic-trail.ts       # Source -> MessageMatch -> Dest trail fixtures
