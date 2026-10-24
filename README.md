@@ -233,10 +233,21 @@ Phase 3 exposes a versioned, narrow, and predictable Fastify REST API:
 
 ---
 
-## 8. Phase 4 Trail Explorer, Evidence Inspector & Demo
+## 8. Phase 4 — Prism-Inspired Landing Page & Trail Explorer
 
-Phase 4 delivers an explainable investigation interface served directly from the Fastify backend:
+Phase 4 delivers an editorial, scientific landing page and explainable investigation explorer inspired by the visual craft, motion choreography, and layout hierarchy of [Prism](https://prismscience.org/?ref=landing.love). Served directly from the unified Fastify backend (`http://127.0.0.1:3000`):
 
+### 1. Cinematic, Abstract Hero
+- **Obsidian Lattice Canvas:** Near-black background (`#06080d`) with a luminous network of particles and connective paths simulating cross-chain messages and evidence relationships.
+- **Pointer Parallax:** Smooth, restrained parallax reacting subtly to mouse position.
+- **Immediate Legibility:** Headline and primary CTAs are readable instantly without waiting for intro animations.
+
+### 2. Scientific Visual Storytelling
+- **The Problem:** Explains the fundamental verification gap—why a source tx and destination tx existing does not, by itself, prove valid cross-chain execution.
+- **The 3-Stage Trail:** Interactive visual pipeline displaying Source Evidence $\rightarrow$ Message Identity Matching $\rightarrow$ Destination Execution.
+- **The Differentiator:** Visual proof of dependency-aware revalidation showing how upstream reorgs cascade to dependents while preserving independent facts.
+
+### 3. Functional Product Explorer
 - **Interactive Claim Dependency Graph:** Visual directed acyclic graph mapping relationships (`AUTHENTICATES`, `SUPPORTS`, `MATCHES`, `FINALITY_GUARD`). Selecting any node highlights prerequisite dependencies and dependent descendants.
 - **Accessible List Alternative:** Keyboard-navigable list view with full screen-reader ARIA semantics.
 - **Multi-Tab Inspector Panel:**

@@ -1,6 +1,7 @@
 // ==========================================================================
-// ChainTrace Phase 4 - Frontend Application Controller
-// Consumes Phase 3 REST APIs, renders interactive DAGs, and handles demo scenarios.
+// ChainTrace — Scientific Editorial Controller & Motion Engine
+// Integrates GSAP scroll storytelling, interactive canvas evidence network,
+// SVG dependency DAG, and Phase 3 Fastify REST APIs.
 // ==========================================================================
 
 // Inlined demo fixtures for immediate reproducible scenarios
@@ -389,6 +390,7 @@ const DEMO_FIXTURES = {
         new_status: 'REVALIDATION_REQUIRED',
         reason_code: 'PREREQUISITE_REVALIDATION_REQUIRED',
         policy_version: '1.0.0',
+        triggering_dependency: 'claim:source-finality:0x444444',
         prev_hash: '4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e',
         record_hash: '5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f',
         details: 'Cascading invalidation from prerequisite finality claim',
@@ -485,7 +487,7 @@ const auditPrevBtn = document.getElementById('auditPrevBtn');
 const auditNextBtn = document.getElementById('auditNextBtn');
 const auditPageDisplay = document.getElementById('auditPageDisplay');
 
-// Modals
+// Modal Elements
 const refreshModal = document.getElementById('refreshModal');
 const refreshBtn = document.getElementById('refreshBtn');
 const closeModalBtn = document.getElementById('closeModalBtn');
@@ -494,16 +496,193 @@ const confirmRefreshBtn = document.getElementById('confirmRefreshBtn');
 const apiKeyInput = document.getElementById('apiKeyInput');
 const checkReorgBox = document.getElementById('checkReorgBox');
 
-const trustModal = document.getElementById('trustModal');
-const aboutTrustBtn = document.getElementById('aboutTrustBtn');
-const closeTrustModalBtn = document.getElementById('closeTrustModalBtn');
-const dismissTrustModalBtn = document.getElementById('dismissTrustModalBtn');
+// --------------------------------------------------------------------------
+// Abstract Scientific Hero Canvas: Luminous Evidence Lattice
+// --------------------------------------------------------------------------
+function initHeroCanvas() {
+  const canvas = document.getElementById('heroCanvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  let width, height;
+  let animationFrameId;
+  let mouse = { x: -1000, y: -1000, targetX: -1000, targetY: -1000 };
+
+  const resize = () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = canvas.parentElement.clientHeight || window.innerHeight * 0.9;
+  };
+  resize();
+  window.addEventListener('resize', resize);
+
+  window.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.targetX = e.clientX - rect.left;
+    mouse.targetY = e.clientY - rect.top;
+  });
+
+  // Nodes representing protocol participants and checkpoints
+  const nodeCount = 38;
+  const nodes = [];
+  const palette = ['#00f2fe', '#38bdf8', '#818cf8', '#22d3ee'];
+
+  for (let i = 0; i < nodeCount; i++) {
+    nodes.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.45,
+      vy: (Math.random() - 0.5) * 0.45,
+      baseRadius: Math.random() * 2.2 + 1.2,
+      color: palette[Math.floor(Math.random() * palette.length)],
+      pulseOffset: Math.random() * Math.PI * 2,
+      orbitSpeed: 0.008 + Math.random() * 0.015
+    });
+  }
+
+  // Floating packets travelling between nodes
+  const packets = [];
+  for (let p = 0; p < 7; p++) {
+    packets.push({
+      sourceIdx: Math.floor(Math.random() * nodeCount),
+      targetIdx: Math.floor(Math.random() * nodeCount),
+      progress: Math.random(),
+      speed: 0.004 + Math.random() * 0.006
+    });
+  }
+
+  let time = 0;
+  const render = () => {
+    time += 0.02;
+    mouse.x += (mouse.targetX - mouse.x) * 0.05;
+    mouse.y += (mouse.targetY - mouse.y) * 0.05;
+
+    ctx.clearRect(0, 0, width, height);
+
+    // Update & draw nodes
+    nodes.forEach((n, idx) => {
+      n.x += n.vx;
+      n.y += n.vy;
+
+      if (n.x < 0 || n.x > width) n.vx *= -1;
+      if (n.y < 0 || n.y > height) n.vy *= -1;
+
+      // Restrained pointer parallax
+      const dx = mouse.x - n.x;
+      const dy = mouse.y - n.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 180) {
+        const force = (180 - dist) / 180;
+        n.x -= (dx / dist) * force * 1.5;
+        n.y -= (dy / dist) * force * 1.5;
+      }
+
+      // Draw connective edges
+      for (let j = idx + 1; j < nodes.length; j++) {
+        const n2 = nodes[j];
+        const dist2 = Math.hypot(n.x - n2.x, n.y - n2.y);
+        if (dist2 < 140) {
+          const alpha = (1 - dist2 / 140) * 0.28;
+          ctx.strokeStyle = `rgba(34, 211, 238, ${alpha})`;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(n.x, n.y);
+          ctx.lineTo(n2.x, n2.y);
+          ctx.stroke();
+        }
+      }
+
+      // Draw node
+      const pulse = Math.sin(time + n.pulseOffset) * 0.5 + 1;
+      ctx.fillStyle = n.color;
+      ctx.shadowColor = n.color;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.baseRadius * pulse, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+
+    // Draw flowing cross-chain packets
+    packets.forEach((pkt) => {
+      pkt.progress += pkt.speed;
+      if (pkt.progress >= 1) {
+        pkt.progress = 0;
+        pkt.sourceIdx = pkt.targetIdx;
+        pkt.targetIdx = Math.floor(Math.random() * nodes.length);
+      }
+
+      const p1 = nodes[pkt.sourceIdx];
+      const p2 = nodes[pkt.targetIdx];
+      if (p1 && p2) {
+        const px = p1.x + (p2.x - p1.x) * pkt.progress;
+        const py = p1.y + (p2.y - p1.y) * pkt.progress;
+
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#00f2fe';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    });
+
+    animationFrameId = requestAnimationFrame(render);
+  };
+
+  render();
+}
 
 // --------------------------------------------------------------------------
-// Initialization & Event Binding
+// GSAP Choreographed Reveals
+// --------------------------------------------------------------------------
+function initGsapAnimations() {
+  if (typeof gsap === 'undefined') return;
+
+  // Reduced motion check
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return;
+  }
+
+  // Hero Initial Load Timeline
+  const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+  heroTl
+    .from('.gsap-reveal', {
+      y: 30,
+      opacity: 0,
+      duration: 0.9,
+      stagger: 0.14,
+      delay: 0.15
+    });
+
+  // Scroll-Triggered Section Fade-Ins
+  if (typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+
+    document.querySelectorAll('.gsap-scroll-fade').forEach((elem) => {
+      gsap.from(elem, {
+        scrollTrigger: {
+          trigger: elem,
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        },
+        y: 35,
+        opacity: 0,
+        duration: 0.85,
+        ease: 'power2.out'
+      });
+    });
+  }
+}
+
+// --------------------------------------------------------------------------
+// Explorer State & Event Binding
 // --------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
-  // Scenario Pills
+  initHeroCanvas();
+  initGsapAnimations();
+
+  // Scenario Buttons
   document.querySelectorAll('.pill-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
@@ -533,10 +712,6 @@ document.addEventListener('DOMContentLoaded', () => {
   tabAuditBtn.addEventListener('click', () => setInspectorTab('audit'));
 
   // Modals
-  aboutTrustBtn.addEventListener('click', () => trustModal.showModal());
-  closeTrustModalBtn.addEventListener('click', () => trustModal.close());
-  dismissTrustModalBtn.addEventListener('click', () => trustModal.close());
-
   refreshBtn.addEventListener('click', () => refreshModal.showModal());
   closeModalBtn.addEventListener('click', () => refreshModal.close());
   cancelRefreshBtn.addEventListener('click', () => refreshModal.close());
@@ -549,7 +724,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   alertCloseBtn.addEventListener('click', () => alertBanner.style.display = 'none');
 
-  // Load default scenario on launch
+  // Load default verified trail on start
   loadScenario('successful-trail');
 });
 
@@ -572,7 +747,6 @@ async function executeLookup() {
   const chainId = 11155111;
 
   try {
-    // Attempt real Phase 3 API call
     const res = await fetch(`/v1/trails/${chainId}/${txHash.toLowerCase()}`);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -584,7 +758,6 @@ async function executeLookup() {
     fixtureBanner.style.display = 'none';
     currentTrail = trailData;
 
-    // Load audit trail from server
     const auditRes = await fetch(`/v1/trails/${encodeURIComponent(trailData.trailId)}/audit?limit=20&offset=0`);
     if (auditRes.ok) {
       const auditData = await auditRes.json();
@@ -594,10 +767,9 @@ async function executeLookup() {
     }
 
     renderTrail(trailData);
-    showToast('Live trail loaded from database');
+    showToast('Live trail loaded from SQLite store');
   } catch (err) {
-    // If backend is not serving this specific hash, fall back to fixture scenario or show error
-    console.warn('API call failed, falling back to matching scenario fixture if available:', err);
+    console.warn('Live API query not matched, falling back to scenario fixture:', err);
     const matched = Object.values(DEMO_FIXTURES).find(f => f.trail.source.txHash.toLowerCase() === txHash.toLowerCase());
 
     if (matched) {
@@ -628,6 +800,27 @@ function loadScenario(scenarioId) {
   currentAuditEvents = fixture.auditTrail;
 
   renderTrail(currentTrail);
+
+  // If Upstream Reorg scenario, trigger visual propagation effect
+  if (scenarioId === 'dependency-change') {
+    triggerReorgPropagationAnimation();
+  }
+}
+
+function triggerReorgPropagationAnimation() {
+  const dagSvgEl = document.getElementById('dagSvg');
+  if (!dagSvgEl) return;
+
+  // Pulse edge connecting finality to message match
+  const edges = document.querySelectorAll('.edge-line');
+  edges.forEach(e => {
+    e.style.stroke = '#c084fc';
+    e.style.strokeWidth = '4';
+    setTimeout(() => {
+      e.style.stroke = '';
+      e.style.strokeWidth = '';
+    }, 1500);
+  });
 }
 
 async function executeRefresh() {
@@ -663,7 +856,6 @@ async function executeRefresh() {
     const refreshResult = await res.json();
     showToast(`Revalidation complete: ${refreshResult.affectedClaimsCount} claims evaluated`);
 
-    // Reload refreshed trail
     await executeLookup();
   } catch (err) {
     showError('Revalidation Failed', err.message || 'An error occurred during revalidation.');
@@ -692,7 +884,7 @@ function renderTrail(trail) {
     trustCaveatsText.textContent = trail.trustAssumptions[0];
   }
 
-  // Render DAG & List
+  // Render DAG & Accessible List
   renderDag(trail.claims);
   renderClaimsListFallback(trail.claims);
 
@@ -702,10 +894,10 @@ function renderTrail(trail) {
   // Render Audit Timeline
   renderAuditTimeline(currentAuditEvents);
 
-  // Revalidation Impact
+  // Revalidation Impact Card
   renderRevalidationImpact(trail.claims);
 
-  // Select first claim by default
+  // Default select first claim
   if (trail.claims.length > 0) {
     selectClaim(trail.claims[0].claim_id);
   }
@@ -750,17 +942,16 @@ function renderDag(claims) {
   const startY = 30;
   const gapY = 90;
 
-  // Compute node positions (vertical hierarchy)
   const nodePositions = new Map();
   claims.forEach((claim, idx) => {
     nodePositions.set(claim.claim_id, {
-      x: startX + (idx % 2 === 1 ? 50 : 0),
+      x: startX + (idx % 2 === 1 ? 55 : 0),
       y: startY + idx * gapY,
       claim
     });
   });
 
-  // Render Directed Edges
+  // Render Edges
   claims.forEach((claim) => {
     const targetPos = nodePositions.get(claim.claim_id);
     if (!targetPos) return;
@@ -795,7 +986,7 @@ function renderDag(claims) {
     });
   });
 
-  // Render Node Cards
+  // Render Nodes
   claims.forEach((claim) => {
     const pos = nodePositions.get(claim.claim_id);
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -803,16 +994,14 @@ function renderDag(claims) {
     g.setAttribute('data-id', claim.claim_id);
     g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
 
-    // Rect Card Background
     const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     rect.setAttribute('width', nodeWidth);
     rect.setAttribute('height', nodeHeight);
     rect.setAttribute('rx', 8);
-    rect.setAttribute('fill', '#131a2b');
+    rect.setAttribute('fill', '#0d121c');
     rect.setAttribute('stroke', getStatusBorderColor(claim.status));
-    rect.setAttribute('stroke-width', 1.5);
+    rect.setAttribute('stroke-width', 1.6);
 
-    // Title Text
     const textTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     textTitle.setAttribute('x', 14);
     textTitle.setAttribute('y', 26);
@@ -821,7 +1010,6 @@ function renderDag(claims) {
     textTitle.setAttribute('font-weight', '700');
     textTitle.textContent = formatClaimType(claim.claim_type);
 
-    // Subtitle / Status Text
     const textSub = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     textSub.setAttribute('x', 14);
     textSub.setAttribute('y', 48);
@@ -845,7 +1033,6 @@ function selectClaim(claimId) {
   const claim = currentTrail.claims.find(c => c.claim_id === claimId);
   if (!claim) return;
 
-  // Highlight SVG Node
   document.querySelectorAll('.node-card-group').forEach(el => {
     el.classList.remove('selected', 'highlighted');
     if (el.getAttribute('data-id') === claimId) {
@@ -853,7 +1040,6 @@ function selectClaim(claimId) {
     }
   });
 
-  // Highlight Edges & Prerequisites
   const prereqs = claim.prerequisites || [];
   document.querySelectorAll('.edge-line').forEach(el => {
     el.classList.remove('active');
@@ -864,18 +1050,15 @@ function selectClaim(claimId) {
     if (target === claimId) {
       el.classList.add('active');
       el.setAttribute('marker-end', 'url(#arrow-active)');
-      // Highlight prerequisite node
       const srcNode = document.querySelector(`.node-card-group[data-id="${src}"]`);
       if (srcNode) srcNode.classList.add('highlighted');
     }
   });
 
-  // Update List Fallback active state
   document.querySelectorAll('.list-claim-item').forEach(el => {
     el.classList.toggle('selected', el.getAttribute('data-id') === claimId);
   });
 
-  // Populate Claim Inspector
   claimNameDisplay.textContent = formatClaimType(claim.claim_type);
   claimIdDisplay.textContent = claim.claim_id;
   claimReasonCode.textContent = claim.status_reason.code;
@@ -887,7 +1070,6 @@ function selectClaim(claimId) {
 
   renderStatusBadge(claimStatusBadge, claimStatusBadge, claim.status);
 
-  // Evidence References
   claimEvidenceRefs.innerHTML = '';
   const evIds = claim.evidenceIds || [];
   if (evIds.length === 0) {
@@ -906,7 +1088,6 @@ function selectClaim(claimId) {
     });
   }
 
-  // Ensure claim tab is active
   setInspectorTab('claim');
 }
 
@@ -1050,7 +1231,7 @@ function renderRevalidationImpact(claims) {
 }
 
 // --------------------------------------------------------------------------
-// UI Helpers & Tab Navigation
+// UI Helpers
 // --------------------------------------------------------------------------
 function setInspectorTab(tab) {
   tabClaimBtn.classList.toggle('active', tab === 'claim');
@@ -1114,7 +1295,7 @@ function getStatusBorderColor(status) {
     case 'INCONCLUSIVE': return '#f59e0b';
     case 'REVALIDATION_REQUIRED': return '#c084fc';
     case 'INVALID': return '#f43f5e';
-    default: return '#475569';
+    default: return '#334155';
   }
 }
 

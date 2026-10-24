@@ -9,14 +9,18 @@
 
 ## 1. Executive Summary
 
-Phase 4 delivers the user interface and presentation layer for ChainTrace. Built directly over the persisted Phase 3 REST APIs, the **ChainTrace Trail Explorer** transforms cross-chain verification from opaque backend evaluations into an explainable, interactive developer tool.
+Phase 4 delivers the redesigned landing page and presentation layer for ChainTrace, heavily inspired by the visual craft, scientific storytelling, and deliberate motion principles of [Prism](https://prismscience.org/?ref=landing.love). Built directly over the persisted Phase 3 REST APIs, ChainTrace transforms cross-chain verification from opaque backend evaluations into an explainable, cinematic, and interactive developer tool.
 
 ### Core Principles Upheld
-1. **Explain, Don't Decorate:** Every visual badge is accompanied by an exact machine reason code, policy identifier, policy version, and evaluation timestamp.
-2. **Truthful States:** `VERIFIED`, `INVALID`, `INCONCLUSIVE`, `REVALIDATION_REQUIRED`, and `UNVERIFIED` are visually distinct with unique accessible color schemes, border glows, and textual indicators.
-3. **Trail-First UX:** Users follow a linear cross-chain progression (`Source Transaction` $\rightarrow$ `PacketSent` $\rightarrow$ `PacketDelivered` $\rightarrow$ `Destination Execution`) and drill down into individual claims and supporting evidence.
-4. **Use Real APIs & Strict Separation:** The UI communicates with Phase 3 REST endpoints (`/v1/trails/...`, `/v1/claims/...`, `/v1/evidence/...`, `/v1/trails/.../audit`, `/v1/trails/.../refresh`). Demo scenarios are clearly badged with a distinct `[DEMO FIXTURE]` banner to avoid disguising mock data as real verification.
-5. **No Fake Live Activity:** The UI never fabricates simulated reorgs or verifications as if they occurred on a live blockchain. Reorg and mismatch behaviors are presented as reproducible test scenarios.
+1. **Cinematic, Abstract Hero:** A near-black obsidian canvas (`#06080d`) featuring an interactive, particle-lattice network animation that subtly responds to pointer movement via smooth parallax while preserving immediate headline readability.
+2. **Scientific Visual Storytelling:** Replaces generic SaaS feature cards with custom visual models:
+   - *The Verification Gap:* Explains why the mere existence of source and destination transactions does not prove execution integrity.
+   - *The Three-Stage Trail:* Step-by-step visual exploration of Source Evidence $\rightarrow$ Message Identity $\rightarrow$ Destination Execution.
+   - *Dependency-Aware Revalidation:* Demonstrates how upstream block hash mutations cascade strictly to affected claims while preserving independent destination execution proofs.
+3. **Motion with Meaning:** Staggered section reveals via GSAP ScrollTrigger, restrained particle velocity, edge-highlighting hover feedback, state change propagation ripples, and strict compliance with `prefers-reduced-motion`.
+4. **Explain, Don't Decorate:** Every visual badge is accompanied by an exact machine reason code, policy identifier, policy version, and evaluation timestamp.
+5. **Truthful States & Explicit Fixtures:** `VERIFIED`, `INVALID`, `INCONCLUSIVE`, `REVALIDATION_REQUIRED`, and `UNVERIFIED` are visually distinct with unique accessible color schemes, border glows, and textual indicators. Interactive scenarios 2, 3, and 4 display a prominent `[DEMO FIXTURE MODE]` banner to guarantee users never mistake simulated reorgs for live chain events.
+6. **No Fake Live Activity:** The UI never fabricates simulated reorgs or verifications as if they occurred on a live blockchain. Reorg and mismatch behaviors are presented as reproducible test scenarios.
 
 ---
 
