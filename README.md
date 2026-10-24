@@ -143,6 +143,8 @@ chaintrace/
 │       └── phase-2-report.md            # Phase 2 implementation report & acceptance
 │   └── phase-3/                         # Phase 3 Persistence, API & Auditability
 │       └── phase-3-report.md            # Phase 3 implementation report & acceptance
+│   └── phase-4/                         # Phase 4 Trail Explorer & Evidence Inspector
+│       └── phase-4-report.md            # Phase 4 implementation report & demo guide
 ├── packages/
 │   ├── domain/                          # Domain models, schemas & audit trail
 │   │   └── src/
@@ -180,16 +182,27 @@ chaintrace/
 │   │   └── src/
 │   │       ├── durable-trail-service.ts # Orchestrates live ingestion, caching & atomic writes
 │   │       └── index.ts                 # Service exports
-│   └── api/                             # Phase 3 Fastify REST API
+│   ├── api/                             # Phase 3 Fastify REST API
+│   │   └── src/
+│   │       ├── server.ts                # Fastify server, validation, auth guard, rate limits
+│   │       ├── start.ts                 # Unified standalone server entrypoint
+│   │       └── index.ts                 # API exports
+│   └── ui/                              # Phase 4 Trail Explorer & Inspector
+│       ├── public/
+│       │   ├── index.html               # Semantic accessible explorer interface
+│       │   ├── styles.css               # Modern cyber-sleek design system
+│       │   └── app.js                   # Interactive DAG graph & inspector controller
 │       └── src/
-│           ├── server.ts                # Fastify server, validation, auth guard, rate limits
-│           └── index.ts                 # API exports
+│           ├── client.ts                # Typed frontend API client
+│           ├── demo-scenarios.ts        # 4 reproducible scenarios with fixture labeling
+│           └── index.ts                 # UI exports
 └── tests/
     ├── acceptance.test.ts               # Phase 1 Acceptance suite for T01 - T12
     ├── adapters/                        # Phase 2 RPC, Decoder & Adapter tests
     ├── integration/                     # Phase 2 Real chain end-to-end integration tests
     ├── persistence/                     # Phase 3 SQLite migrations, OCC & restart tests
     ├── api/                             # Phase 3 Fastify HTTP endpoints & auth tests
+    ├── ui/                              # Phase 4 UI client, static serving & demo tests
     ├── unit/                            # DAG cycle detection & fault injection tests
     └── property/                        # Graph property-based invariant tests
 ```
@@ -220,7 +233,25 @@ Phase 3 exposes a versioned, narrow, and predictable Fastify REST API:
 
 ---
 
-## 8. Verification & Test Commands
+## 8. Phase 4 Trail Explorer, Evidence Inspector & Demo
+
+Phase 4 delivers an explainable investigation interface served directly from the Fastify backend:
+
+- **Interactive Claim Dependency Graph:** Visual directed acyclic graph mapping relationships (`AUTHENTICATES`, `SUPPORTS`, `MATCHES`, `FINALITY_GUARD`). Selecting any node highlights prerequisite dependencies and dependent descendants.
+- **Accessible List Alternative:** Keyboard-navigable list view with full screen-reader ARIA semantics.
+- **Multi-Tab Inspector Panel:**
+  - **Claim Inspector:** Proposition, status reason code, human explanation, policy identifier, and version.
+  - **Evidence Inspector:** Normalized observations, provider, verification method, content hash (with one-click copy), and raw JSON payload.
+  - **Audit Timeline:** Append-only record of transitions with sequence numbers, old $\rightarrow$ new statuses, and cryptographic hash chaining (`prev_hash` $\rightarrow$ `record_hash`).
+- **Reproducible Demo Scenarios:**
+  1. `1. Verified Trail`: Live Sepolia $\rightarrow$ Polygon Amoy LayerZero v2 flow.
+  2. `2. Message Mismatch [FIXTURE]`: Contradictory GUIDs evaluating truthfully to `INVALID`.
+  3. `3. Inflight Inconclusive [FIXTURE]`: Pending destination indexing reported as `INCONCLUSIVE`, not fraud.
+  4. `4. Upstream Reorg [FIXTURE]`: Source block hash change causing dependency-aware revalidation while preserving independent destination execution.
+
+---
+
+## 9. Verification & Test Commands
 
 ```bash
 # Typecheck entire TypeScript codebase
@@ -239,9 +270,15 @@ npm run test:persistence
 # Run Phase 3 Fastify REST API tests (auth, validation, endpoints, rate limits)
 npm run test:api
 
-# Run entire test suite (65 passing tests)
+# Run Phase 4 UI client & demo scenario tests
+npm run test:ui
+
+# Run entire test suite (69 passing tests)
 npm test
 
 # Build production bundle
 npm run build
+
+# Start unified Explorer & REST API Server (http://127.0.0.1:3000)
+npm start
 ```

@@ -1,6 +1,6 @@
 import type { DatabaseSync } from 'node:sqlite';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -43,7 +43,12 @@ export class SchemaMigrator {
 
     // Migration 1: Initial Core Schema
     if (!appliedSet.has(1)) {
-      const sqlPath = join(__dirname, 'schema.sql');
+      const candidates = [
+        join(__dirname, 'schema.sql'),
+        resolve(process.cwd(), 'packages', 'persistence', 'src', 'schema.sql'),
+        resolve(__dirname, '..', '..', '..', 'packages', 'persistence', 'src', 'schema.sql')
+      ];
+      const sqlPath = candidates.find((p) => existsSync(p)) || candidates[0];
       const schemaSql = readFileSync(sqlPath, 'utf8');
 
       this.db.exec(schemaSql);

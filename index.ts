@@ -5,3 +5,4 @@ export * from './packages/chain-adapters/src/index.js';
 export * from './packages/persistence/src/index.js';
 export * from './packages/service/src/index.js';
 export * from './packages/api/src/index.js';
+export * from './packages/ui/src/index.js';

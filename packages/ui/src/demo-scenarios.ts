@@ -1,4 +1,4 @@
-import { ClaimRecord, EvidenceRecord, ChainedAuditEvent } from '../../domain/src/index.js';
+import type { ChainedAuditEvent } from '../../domain/src/index.js';
 import { DurableTrailResponse } from '../../service/src/durable-trail-service.js';
 
 export interface DemoScenario {
