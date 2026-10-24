@@ -32,7 +32,7 @@ export interface DestinationEvidenceResult {
   destinationEvent?: EventRecord;
   receiptEvidence?: EvidenceRecord;
   decodedPacket?: DecodedPacketDelivered;
-  status: 'FOUND' | 'NOT_FOUND' | 'AMBIGUOUS';
+  status: 'FOUND' | 'NOT_FOUND' | 'AMBIGUOUS' | 'MISMATCH';
   block?: RpcBlock;
   reason?: string;
 }
@@ -218,6 +218,20 @@ export class LayerZeroV2Adapter {
       );
 
       if (!matchingLog) {
+        const otherDeliveredLog = receipt.logs.find(
+          (l) =>
+            l.address.toLowerCase() === expectedEndpoint &&
+            l.topics[0]?.toLowerCase() === packetDeliveredSig
+        );
+        if (otherDeliveredLog) {
+          const otherDecoded = decodePacketDelivered(otherDeliveredLog);
+          return {
+            status: 'MISMATCH',
+            decodedPacket: otherDecoded,
+            reason: `Destination transaction delivered different GUID: ${otherDecoded.guid} (expected: ${params.guid})`
+          };
+        }
+
         return {
           status: 'NOT_FOUND',
           reason: `Destination transaction did not deliver packet with GUID ${params.guid}`

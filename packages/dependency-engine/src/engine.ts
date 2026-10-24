@@ -504,6 +504,15 @@ export class DependencyEngine {
       }
     }
 
+    // Include ancestors of all matched claims (converging execution paths)
+    for (const claimId of Array.from(relatedClaimIds)) {
+      for (const anc of this.dag.getAncestors(claimId)) {
+        if (this.claims.has(anc)) {
+          relatedClaimIds.add(anc);
+        }
+      }
+    }
+
     const matchedClaims = Array.from(relatedClaimIds).map((id) => this.claims.get(id)!);
 
     const relatedEvidenceIds = new Set<string>();
@@ -533,6 +542,13 @@ export class DependencyEngine {
           allTrailEvents.set(ev.event_id, ev);
         }
       }
+    }
+
+    const matchedEvidence = Array.from(relatedEvidenceIds).map((id) => this.evidence.get(id)!);
+
+    const matchedAudit: ChainedAuditEvent[] = [];
+    for (const claimId of relatedClaimIds) {
+      matchedAudit.push(...this.auditLog.getHistoryForClaim(claimId));
     }
 
     return {

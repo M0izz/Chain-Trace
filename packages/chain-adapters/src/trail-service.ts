@@ -130,7 +130,12 @@ export class CrossChainTrailService {
       source_reference: `layerzero://${decodedPacket.srcEid}->${decodedPacket.dstEid}/${decodedPacket.guid}`,
       verification_method: 'LayerZeroV2PacketHeaderVerification',
       policy_version: this.adapter.profile.policyVersion,
-      result: destResult.status === 'FOUND' ? 'PASS' : 'INCONCLUSIVE',
+      result:
+        destResult.status === 'FOUND'
+          ? 'PASS'
+          : destResult.status === 'MISMATCH'
+            ? 'FAIL'
+            : 'INCONCLUSIVE',
       checked_at: new Date().toISOString(),
       reason: destResult.reason
     };
@@ -154,7 +159,9 @@ export class CrossChainTrailService {
       status_reason: { code: 'AWAITING_VERIFICATION', message: 'Awaiting message match verification' },
       metadata: {
         source_message_id: decodedPacket.guid,
-        destination_message_id: destResult.decodedPacket?.guid ?? (destResult.status === 'NOT_FOUND' ? undefined : decodedPacket.guid)
+        destination_message_id:
+          destResult.decodedPacket?.guid ??
+          (destResult.status === 'FOUND' ? decodedPacket.guid : undefined)
       }
     };
     this.engine.registerClaim(msgMatchClaim);
