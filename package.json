@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A verifiable cross-chain transaction graph with evidence dependencies, auditable claims, and dependency-aware revalidation",
   "main": "dist/index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
@@ -10,6 +11,8 @@
     "test:unit": "vitest run tests/unit",
     "test:property": "vitest run tests/property",
     "test:adapters": "vitest run tests/adapters",
+    "test:persistence": "vitest run tests/persistence",
+    "test:api": "vitest run tests/api",
     "test:integration": "vitest run tests/acceptance.test.ts tests/integration",
     "test:live": "vitest run tests/live",
     "test:watch": "vitest",
@@ -28,5 +31,8 @@
     "@types/node": "^22.10.1",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "fastify": "^5.12.7"
   }
 }
