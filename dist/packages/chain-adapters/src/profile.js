@@ -1,10 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE = void 0;
-exports.formatGuid = formatGuid;
-exports.computeContentHash = computeContentHash;
-const node_crypto_1 = require("node:crypto");
-exports.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE = {
+import { createHash } from 'node:crypto';
+export const LAYERZERO_V2_SEPOLIA_AMOY_PROFILE = {
     version: '1.0.0',
     sourceChain: {
         chainId: 11155111,
@@ -48,7 +43,7 @@ exports.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE = {
 /**
  * Calculates or formats a 32-byte GUID identifier
  */
-function formatGuid(guid) {
+export function formatGuid(guid) {
     const clean = guid.toLowerCase().trim();
     if (clean.startsWith('0x')) {
         return clean;
@@ -58,7 +53,7 @@ function formatGuid(guid) {
 /**
  * Computes deterministic canonical content hash of raw payload bytes
  */
-function computeContentHash(data) {
+export function computeContentHash(data) {
     const content = typeof data === 'string' ? data : JSON.stringify(data);
-    return '0x' + (0, node_crypto_1.createHash)('sha256').update(content).digest('hex');
+    return '0x' + createHash('sha256').update(content).digest('hex');
 }

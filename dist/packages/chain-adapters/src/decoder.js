@@ -1,9 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.decodePacketSent = decodePacketSent;
-exports.decodePacketDelivered = decodePacketDelivered;
-const errors_js_1 = require("./errors.js");
-const profile_js_1 = require("./profile.js");
+import { EventDecodeError } from './errors.js';
+import { LAYERZERO_V2_SEPOLIA_AMOY_PROFILE } from './profile.js';
 /**
  * Strips 0x and standardizes hex strings
  */
@@ -14,14 +10,14 @@ function cleanHex(h) {
  * Decodes a LayerZero v2 PacketSent log event.
  * ABI: event PacketSent(bytes encodedPayload, bytes options, address sendLibrary)
  */
-function decodePacketSent(log) {
-    const expectedSig = profile_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetSentSignature.toLowerCase();
+export function decodePacketSent(log) {
+    const expectedSig = LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetSentSignature.toLowerCase();
     if (!log.topics || log.topics.length === 0 || log.topics[0].toLowerCase() !== expectedSig) {
-        throw new errors_js_1.EventDecodeError(`Topic 0 does not match PacketSent signature`);
+        throw new EventDecodeError(`Topic 0 does not match PacketSent signature`);
     }
     const rawData = cleanHex(log.data || '');
     if (rawData.length < 128) {
-        throw new errors_js_1.EventDecodeError(`Log data too short for ABI encoded PacketSent: ${rawData.length} chars`);
+        throw new EventDecodeError(`Log data too short for ABI encoded PacketSent: ${rawData.length} chars`);
     }
     // In standard ABI encoding for (bytes, bytes, address):
     // word 0 (0..64): offset to encodedPayload
@@ -32,7 +28,7 @@ function decodePacketSent(log) {
         const payloadOffsetBytes = parseInt(rawData.slice(0, 64), 16);
         const payloadOffsetChars = payloadOffsetBytes * 2;
         if (rawData.length < payloadOffsetChars + 64) {
-            throw new errors_js_1.EventDecodeError(`Offset points outside log data bounds`);
+            throw new EventDecodeError(`Offset points outside log data bounds`);
         }
         const payloadLengthBytes = parseInt(rawData.slice(payloadOffsetChars, payloadOffsetChars + 64), 16);
         const payloadStartChars = payloadOffsetChars + 64;
@@ -46,7 +42,7 @@ function decodePacketSent(log) {
         // receiver: bytes32 (32 bytes = 64 hex chars)
         // guid: bytes32 (32 bytes = 64 hex chars)
         if (payloadHex.length < 16 + 8 + 64 + 8 + 64 + 64) {
-            throw new errors_js_1.EventDecodeError(`Packet payload too short for LayerZero v2 header: ${payloadHex.length} chars`);
+            throw new EventDecodeError(`Packet payload too short for LayerZero v2 header: ${payloadHex.length} chars`);
         }
         let cursor = 0;
         const nonceHex = payloadHex.slice(cursor, cursor + 16);
@@ -73,19 +69,19 @@ function decodePacketSent(log) {
         };
     }
     catch (err) {
-        if (err instanceof errors_js_1.EventDecodeError)
+        if (err instanceof EventDecodeError)
             throw err;
-        throw new errors_js_1.EventDecodeError(err instanceof Error ? err.message : String(err));
+        throw new EventDecodeError(err instanceof Error ? err.message : String(err));
     }
 }
 /**
  * Decodes a LayerZero v2 PacketDelivered log event.
  * ABI: event PacketDelivered(bytes32 indexed guid, address indexed origin, address indexed receiver)
  */
-function decodePacketDelivered(log) {
-    const expectedSig = profile_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetDeliveredSignature.toLowerCase();
+export function decodePacketDelivered(log) {
+    const expectedSig = LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetDeliveredSignature.toLowerCase();
     if (!log.topics || log.topics.length < 2 || log.topics[0].toLowerCase() !== expectedSig) {
-        throw new errors_js_1.EventDecodeError(`Topic 0 does not match PacketDelivered signature`);
+        throw new EventDecodeError(`Topic 0 does not match PacketDelivered signature`);
     }
     const guid = `0x${cleanHex(log.topics[1]).toLowerCase()}`;
     const origin = log.topics[2] ? `0x${cleanHex(log.topics[2]).slice(24).toLowerCase()}` : '';

@@ -1,8 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const vitest_1 = require("vitest");
-const index_js_1 = require("../../packages/chain-adapters/src/index.js");
-(0, vitest_1.describe)('Phase 2 — LayerZero v2 Event Decoder (Section 2.3 & 2.4)', () => {
+import { describe, expect, it } from 'vitest';
+import { decodePacketDelivered, decodePacketSent, EventDecodeError, LAYERZERO_V2_SEPOLIA_AMOY_PROFILE } from '../../packages/chain-adapters/src/index.js';
+describe('Phase 2 — LayerZero v2 Event Decoder (Section 2.3 & 2.4)', () => {
     // Helper to build realistic ABI-encoded PacketSent data
     function buildPacketSentLogData(params) {
         // Layout in ABI encoding:
@@ -31,7 +29,7 @@ const index_js_1 = require("../../packages/chain-adapters/src/index.js");
         const optionsLen = '0000000000000000000000000000000000000000000000000000000000000000';
         return '0x' + word0 + word1 + word2 + payloadLength + payloadBytes + optionsLen;
     }
-    (0, vitest_1.it)('correctly decodes LayerZero v2 PacketSent event fields', () => {
+    it('correctly decodes LayerZero v2 PacketSent event fields', () => {
         const rawData = buildPacketSentLogData({
             nonce: 42,
             srcEid: 40161,
@@ -41,8 +39,8 @@ const index_js_1 = require("../../packages/chain-adapters/src/index.js");
             guid: '0xaabbccddeeff00112233445566778899aabbccddeeff00112233445566778899'
         });
         const log = {
-            address: index_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.sourceChain.endpointAddress,
-            topics: [index_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetSentSignature],
+            address: LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.sourceChain.endpointAddress,
+            topics: [LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetSentSignature],
             data: rawData,
             blockNumber: 5420100,
             transactionHash: '0xsource-tx',
@@ -50,23 +48,23 @@ const index_js_1 = require("../../packages/chain-adapters/src/index.js");
             blockHash: '0xsource-block',
             logIndex: 3
         };
-        const decoded = (0, index_js_1.decodePacketSent)(log);
-        (0, vitest_1.expect)(decoded.guid).toBe('0xaabbccddeeff00112233445566778899aabbccddeeff00112233445566778899');
-        (0, vitest_1.expect)(decoded.nonce).toBe(42);
-        (0, vitest_1.expect)(decoded.srcEid).toBe(40161);
-        (0, vitest_1.expect)(decoded.dstEid).toBe(40267);
-        (0, vitest_1.expect)(decoded.sender).toContain('70997970c51812dc3a010c7d01b50e0d17dc79c8');
-        (0, vitest_1.expect)(decoded.receiver).toContain('3c44cdddb6a900fa2b585dd299e03d12fa4293bc');
-        (0, vitest_1.expect)(decoded.logIndex).toBe(3);
+        const decoded = decodePacketSent(log);
+        expect(decoded.guid).toBe('0xaabbccddeeff00112233445566778899aabbccddeeff00112233445566778899');
+        expect(decoded.nonce).toBe(42);
+        expect(decoded.srcEid).toBe(40161);
+        expect(decoded.dstEid).toBe(40267);
+        expect(decoded.sender).toContain('70997970c51812dc3a010c7d01b50e0d17dc79c8');
+        expect(decoded.receiver).toContain('3c44cdddb6a900fa2b585dd299e03d12fa4293bc');
+        expect(decoded.logIndex).toBe(3);
     });
-    (0, vitest_1.it)('correctly decodes LayerZero v2 PacketDelivered event fields', () => {
+    it('correctly decodes LayerZero v2 PacketDelivered event fields', () => {
         const guid = '0xaabbccddeeff00112233445566778899aabbccddeeff00112233445566778899';
         const origin = '0x00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c8';
         const receiver = '0x0000000000000000000000003c44cdddb6a900fa2b585dd299e03d12fa4293bc';
         const log = {
-            address: index_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.destinationChain.endpointAddress,
+            address: LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.destinationChain.endpointAddress,
             topics: [
-                index_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetDeliveredSignature,
+                LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetDeliveredSignature,
                 guid,
                 origin,
                 receiver
@@ -78,13 +76,13 @@ const index_js_1 = require("../../packages/chain-adapters/src/index.js");
             blockHash: '0xdest-block',
             logIndex: 1
         };
-        const decoded = (0, index_js_1.decodePacketDelivered)(log);
-        (0, vitest_1.expect)(decoded.guid).toBe(guid);
-        (0, vitest_1.expect)(decoded.origin).toBe('0x70997970c51812dc3a010c7d01b50e0d17dc79c8');
-        (0, vitest_1.expect)(decoded.receiver).toBe('0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc');
-        (0, vitest_1.expect)(decoded.logIndex).toBe(1);
+        const decoded = decodePacketDelivered(log);
+        expect(decoded.guid).toBe(guid);
+        expect(decoded.origin).toBe('0x70997970c51812dc3a010c7d01b50e0d17dc79c8');
+        expect(decoded.receiver).toBe('0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc');
+        expect(decoded.logIndex).toBe(1);
     });
-    (0, vitest_1.it)('rejects log with invalid topic0 signature with EventDecodeError', () => {
+    it('rejects log with invalid topic0 signature with EventDecodeError', () => {
         const log = {
             address: '0xendpoint',
             topics: ['0xINVALID_TOPIC_SIGNATURE'],
@@ -95,13 +93,13 @@ const index_js_1 = require("../../packages/chain-adapters/src/index.js");
             blockHash: '0xblock',
             logIndex: 0
         };
-        (0, vitest_1.expect)(() => (0, index_js_1.decodePacketSent)(log)).toThrow(index_js_1.EventDecodeError);
-        (0, vitest_1.expect)(() => (0, index_js_1.decodePacketDelivered)(log)).toThrow(index_js_1.EventDecodeError);
+        expect(() => decodePacketSent(log)).toThrow(EventDecodeError);
+        expect(() => decodePacketDelivered(log)).toThrow(EventDecodeError);
     });
-    (0, vitest_1.it)('rejects truncated log data with EventDecodeError', () => {
+    it('rejects truncated log data with EventDecodeError', () => {
         const log = {
-            address: index_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.sourceChain.endpointAddress,
-            topics: [index_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetSentSignature],
+            address: LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.sourceChain.endpointAddress,
+            topics: [LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetSentSignature],
             data: '0x1234', // Truncated
             blockNumber: 100,
             transactionHash: '0xtx',
@@ -109,6 +107,6 @@ const index_js_1 = require("../../packages/chain-adapters/src/index.js");
             blockHash: '0xblock',
             logIndex: 0
         };
-        (0, vitest_1.expect)(() => (0, index_js_1.decodePacketSent)(log)).toThrow(index_js_1.EventDecodeError);
+        expect(() => decodePacketSent(log)).toThrow(EventDecodeError);
     });
 });

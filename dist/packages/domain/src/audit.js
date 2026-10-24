@@ -1,15 +1,12 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppendOnlyAuditLog = void 0;
-const node_crypto_1 = require("node:crypto");
-const schemas_js_1 = require("./schemas.js");
+import { createHash } from 'node:crypto';
+import { validateAuditEvent } from './schemas.js';
 /**
  * AppendOnlyAuditLog enforces:
  * 1. Strict append-only semantics (no updates or deletes).
  * 2. Cryptographic/hash chaining of consecutive events for tamper evidence.
  * 3. Immutable snapshots upon reading.
  */
-class AppendOnlyAuditLog {
+export class AppendOnlyAuditLog {
     events = [];
     claimEventsIndex = new Map();
     /**
@@ -35,8 +32,8 @@ class AppendOnlyAuditLog {
             event_type: params.eventType,
             correlation_id: params.correlationId
         };
-        (0, schemas_js_1.validateAuditEvent)(baseEvent);
-        const recordHash = (0, node_crypto_1.createHash)('sha256')
+        validateAuditEvent(baseEvent);
+        const recordHash = createHash('sha256')
             .update(JSON.stringify({
             sequence,
             prevHash,
@@ -85,7 +82,7 @@ class AppendOnlyAuditLog {
                 return false;
             }
             const { sequence, prev_hash, record_hash, ...baseEvent } = current;
-            const computedHash = (0, node_crypto_1.createHash)('sha256')
+            const computedHash = createHash('sha256')
                 .update(JSON.stringify({
                 sequence,
                 prevHash: prev_hash,
@@ -99,4 +96,3 @@ class AppendOnlyAuditLog {
         return true;
     }
 }
-exports.AppendOnlyAuditLog = AppendOnlyAuditLog;

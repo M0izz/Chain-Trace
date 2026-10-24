@@ -1,31 +1,20 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DomainValidationError = void 0;
-exports.generateEventId = generateEventId;
-exports.validateEventRecord = validateEventRecord;
-exports.validateEvidenceRecord = validateEvidenceRecord;
-exports.validateClaimRecord = validateClaimRecord;
-exports.validateDependencyEdge = validateDependencyEdge;
-exports.isValidStatusTransition = isValidStatusTransition;
-exports.validateAuditEvent = validateAuditEvent;
-class DomainValidationError extends Error {
+export class DomainValidationError extends Error {
     constructor(message) {
         super(message);
         this.name = 'DomainValidationError';
     }
 }
-exports.DomainValidationError = DomainValidationError;
 /**
  * Generate a deterministic event ID from canonical attributes.
  */
-function generateEventId(chainId, txHash, eventIndex) {
+export function generateEventId(chainId, txHash, eventIndex) {
     const normTx = txHash.toLowerCase().trim();
     return `event:${chainId}:${normTx}:${eventIndex}`;
 }
 /**
  * Validates an EventRecord against mandatory constraints.
  */
-function validateEventRecord(event) {
+export function validateEventRecord(event) {
     if (!event.event_id || typeof event.event_id !== 'string') {
         throw new DomainValidationError('event_id must be a non-empty string');
     }
@@ -51,7 +40,7 @@ function validateEventRecord(event) {
 /**
  * Validates an EvidenceRecord.
  */
-function validateEvidenceRecord(evidence) {
+export function validateEvidenceRecord(evidence) {
     if (!evidence.evidence_id || typeof evidence.evidence_id !== 'string') {
         throw new DomainValidationError('evidence_id must be a non-empty string');
     }
@@ -74,7 +63,7 @@ function validateEvidenceRecord(evidence) {
 /**
  * Validates a ClaimRecord and required invariants.
  */
-function validateClaimRecord(claim) {
+export function validateClaimRecord(claim) {
     if (!claim.claim_id || typeof claim.claim_id !== 'string') {
         throw new DomainValidationError('claim_id must be a non-empty string');
     }
@@ -107,7 +96,7 @@ function validateClaimRecord(claim) {
 /**
  * Validates a DependencyEdge.
  */
-function validateDependencyEdge(edge) {
+export function validateDependencyEdge(edge) {
     if (!edge.dependency_id || typeof edge.dependency_id !== 'string') {
         throw new DomainValidationError('dependency_id must be a non-empty string');
     }
@@ -134,7 +123,7 @@ function validateDependencyEdge(edge) {
 /**
  * Validates allowed status transitions according to the state machine in Section 6.
  */
-function isValidStatusTransition(prev, next) {
+export function isValidStatusTransition(prev, next) {
     if (prev === next) {
         return true; // Idempotent same-status is allowed
     }
@@ -160,7 +149,7 @@ function isValidStatusTransition(prev, next) {
 /**
  * Validates an AuditEvent.
  */
-function validateAuditEvent(event) {
+export function validateAuditEvent(event) {
     if (!event.audit_id || typeof event.audit_id !== 'string') {
         throw new DomainValidationError('audit_id must be a non-empty string');
     }

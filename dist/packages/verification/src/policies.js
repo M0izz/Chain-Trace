@@ -1,15 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.POLICY_IDS = void 0;
-exports.evaluateEventInclusionPolicy = evaluateEventInclusionPolicy;
-exports.evaluateSourceFinalityPolicy = evaluateSourceFinalityPolicy;
-exports.evaluateMessageMatchPolicy = evaluateMessageMatchPolicy;
-exports.evaluateDestinationExecutionPolicy = evaluateDestinationExecutionPolicy;
-exports.evaluatePathSupportPolicy = evaluatePathSupportPolicy;
 /**
  * Standard policy IDs used in ChainTrace Phase 1
  */
-exports.POLICY_IDS = {
+export const POLICY_IDS = {
     EVENT_INCLUSION: 'policy:event-inclusion',
     SOURCE_FINALITY: 'policy:source-finality',
     MESSAGE_MATCH: 'policy:message-match',
@@ -23,7 +15,7 @@ exports.POLICY_IDS = {
  * - If evidence has result === 'INCONCLUSIVE', returns INCONCLUSIVE.
  * - If evidence has result === 'FAIL', returns INVALID.
  */
-function evaluateEventInclusionPolicy(input) {
+export function evaluateEventInclusionPolicy(input) {
     const { dependencies } = input;
     const requiredEvidence = Array.from(dependencies.parentEvidence.values());
     if (requiredEvidence.length === 0) {
@@ -71,7 +63,7 @@ function evaluateEventInclusionPolicy(input) {
  * Evaluates SOURCE_FINALIZED claim.
  * Requires parent EVENT_INCLUDED claim to be VERIFIED, plus header attestation / finality guard.
  */
-function evaluateSourceFinalityPolicy(input) {
+export function evaluateSourceFinalityPolicy(input) {
     const { dependencies } = input;
     const parentClaims = Array.from(dependencies.parentClaims.values());
     // Must have a parent claim that is EVENT_INCLUDED
@@ -139,7 +131,7 @@ function evaluateSourceFinalityPolicy(input) {
  * Checks protocol-specific message IDs, domain separation, and attestation.
  * Does NOT infer match from superficial timestamp or amount similarity alone.
  */
-function evaluateMessageMatchPolicy(input) {
+export function evaluateMessageMatchPolicy(input) {
     const { claim, dependencies } = input;
     const parentClaims = Array.from(dependencies.parentClaims.values());
     // Source finality must be verified
@@ -209,7 +201,7 @@ function evaluateMessageMatchPolicy(input) {
 /**
  * Evaluates DESTINATION_EXECUTED claim.
  */
-function evaluateDestinationExecutionPolicy(input) {
+export function evaluateDestinationExecutionPolicy(input) {
     const { dependencies } = input;
     const evidence = Array.from(dependencies.parentEvidence.values());
     if (evidence.length === 0) {
@@ -243,7 +235,7 @@ function evaluateDestinationExecutionPolicy(input) {
  * Evaluates PATH_SUPPORTED claim.
  * Requires that all dependent prerequisite claims along the cross-chain path are VERIFIED.
  */
-function evaluatePathSupportPolicy(input) {
+export function evaluatePathSupportPolicy(input) {
     const { dependencies } = input;
     const parentClaims = Array.from(dependencies.parentClaims.values());
     if (parentClaims.length === 0) {

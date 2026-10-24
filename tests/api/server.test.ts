@@ -62,14 +62,10 @@ describe('Fastify REST API (Phase 3)', () => {
             transactionIndex: '0x1',
             logs: [
               {
-                address: '0x6EDCE65403992e310A62460808c4b910D972f10f',
-                topics: [
-                  '0x2ced6256f1dcab54ca70a48ec789a50ae45ec60057416fbcf4b92b0c36cb2296',
-                  guid,
-                  '0x00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c8'
-                ],
+                address: LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.sourceChain.endpointAddress,
+                topics: [LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetSentSignature],
                 data: rawData,
-                logIndex: '0x0',
+                logIndex: '0x2',
                 transactionHash: sourceTxHash,
                 blockNumber: '0x52b414'
               }
@@ -81,7 +77,7 @@ describe('Fastify REST API (Phase 3)', () => {
         return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: { number: '0x52b430', hash: '0xlatest-block' } }), { status: 200 });
       }
       if (m === 'eth_getBlockByHash') {
-        return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: { number: '0x52b414', hash: '0xsource-block' } }), { status: 200 });
+        return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: { number: '0x52b414', hash: '0xsource-block', timestamp: '0x671a3000' } }), { status: 200 });
       }
       return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: null }), { status: 200 });
     };
@@ -103,7 +99,7 @@ describe('Fastify REST API (Phase 3)', () => {
         return new Response(JSON.stringify({
           jsonrpc: '2.0',
           id: 1,
-          result: { hash: destTxHash, blockNumber: '0x989680', blockHash: '0xdest-block', transactionIndex: '0x2' }
+          result: { hash: destTxHash, blockNumber: '0x9626dc', blockHash: '0xdest-block', transactionIndex: '0x2' }
         }), { status: 200 });
       }
       if (m === 'eth_getTransactionReceipt') {
@@ -113,32 +109,55 @@ describe('Fastify REST API (Phase 3)', () => {
           result: {
             transactionHash: destTxHash,
             status: '0x1',
-            blockNumber: '0x989680',
+            blockNumber: '0x9626dc',
             blockHash: '0xdest-block',
-            transactionIndex: '0x2',
+            transactionIndex: '0x1',
             logs: [
               {
-                address: '0x6EDCE65403992e310A62460808c4b910D972f10f',
+                address: LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.destinationChain.endpointAddress,
                 topics: [
-                  '0x415b3c0678d48a3aa6240d04968df32ff46fa01a74e50eb9304918e3dd56ceb8',
+                  LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetDeliveredSignature,
                   guid,
-                  '0x0000000000000000000000003c44cdddb6a900fa2b585dd299e03d12fa4293bc',
-                  '0x00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c8'
+                  '0x00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c8',
+                  '0x0000000000000000000000003c44cdddb6a900fa2b585dd299e03d12fa4293bc'
                 ],
-                data: '0x0000000000000000000000000000000000000000000000000000000000000001',
+                data: '0x',
                 logIndex: '0x1',
                 transactionHash: destTxHash,
-                blockNumber: '0x989680'
+                blockNumber: '0x9626dc'
               }
             ]
           }
         }), { status: 200 });
       }
+      if (m === 'eth_getLogs') {
+        return new Response(JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          result: [
+            {
+              address: LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.destinationChain.endpointAddress,
+              topics: [
+                LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetDeliveredSignature,
+                guid,
+                '0x00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c8',
+                '0x0000000000000000000000003c44cdddb6a900fa2b585dd299e03d12fa4293bc'
+              ],
+              data: '0x',
+              blockNumber: '0x9626dc',
+              blockHash: '0xdest-block',
+              transactionHash: destTxHash,
+              transactionIndex: '0x1',
+              logIndex: '0x1'
+            }
+          ]
+        }), { status: 200 });
+      }
       if (m === 'eth_getBlockByNumber' && body.params[0] === 'latest') {
-        return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: { number: '0x989700', hash: '0xdest-latest' } }), { status: 200 });
+        return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: { number: '0x9626ee', hash: '0xdest-latest' } }), { status: 200 });
       }
       if (m === 'eth_getBlockByHash') {
-        return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: { number: '0x989680', hash: '0xdest-block' } }), { status: 200 });
+        return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: { number: '0x9626dc', hash: '0xdest-block', timestamp: '0x671a3100' } }), { status: 200 });
       }
       return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: null }), { status: 200 });
     };
@@ -231,8 +250,6 @@ describe('Fastify REST API (Phase 3)', () => {
       method: 'GET',
       url: `/v1/trails/11155111/${sourceTxHash}`
     });
-
-    if (res1.statusCode !== 200) console.error('RES1 BODY:', res1.body);
     expect(res1.statusCode).toBe(200);
     const body1 = JSON.parse(res1.body);
     expect(body1.schemaVersion).toBe('1.0');

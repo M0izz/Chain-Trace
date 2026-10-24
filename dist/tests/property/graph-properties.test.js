@@ -1,14 +1,12 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const vitest_1 = require("vitest");
-const index_js_1 = require("../../packages/dependency-engine/src/index.js");
-const index_js_2 = require("../../packages/verification/src/index.js");
-(0, vitest_1.describe)('Phase 1 Property-Style Tests (Section 1.6)', () => {
+import { describe, expect, it } from 'vitest';
+import { CycleDetectedError, DependencyDAG, DependencyEngine } from '../../packages/dependency-engine/src/index.js';
+import { POLICY_IDS } from '../../packages/verification/src/index.js';
+describe('Phase 1 Property-Style Tests (Section 1.6)', () => {
     /**
      * Property 1: No accepted graph contains a cycle.
      */
-    (0, vitest_1.it)('Property 1: Invariant — No accepted graph ever contains a cycle', () => {
-        const dag = new index_js_1.DependencyDAG();
+    it('Property 1: Invariant — No accepted graph ever contains a cycle', () => {
+        const dag = new DependencyDAG();
         const nodeCount = 20;
         // Build a multi-layered DAG
         for (let i = 0; i < nodeCount - 1; i++) {
@@ -19,12 +17,12 @@ const index_js_2 = require("../../packages/verification/src/index.js");
         }
         // Topological sort must succeed on any accepted graph without error
         const sorted = dag.topologicalSort();
-        (0, vitest_1.expect)(sorted.length).toBe(nodeCount);
+        expect(sorted.length).toBe(nodeCount);
         // Attempting to add ANY backward edge must be rejected
         for (let i = 1; i < nodeCount; i++) {
-            (0, vitest_1.expect)(() => {
+            expect(() => {
                 dag.addEdge(`N_${i}`, 'CLAIM', `N_0`, 'CLAIM');
-            }).toThrow(index_js_1.CycleDetectedError);
+            }).toThrow(CycleDetectedError);
         }
     });
     /**
@@ -32,8 +30,8 @@ const index_js_2 = require("../../packages/verification/src/index.js");
      * Every returned descendant is reachable from the changed node,
      * and no reachable dependent claim is omitted.
      */
-    (0, vitest_1.it)('Property 2 & 3: Invariant — Descendants set is exact (sound and complete)', () => {
-        const dag = new index_js_1.DependencyDAG();
+    it('Property 2 & 3: Invariant — Descendants set is exact (sound and complete)', () => {
+        const dag = new DependencyDAG();
         // Branching and converging tree
         // R -> A -> C -> E
         // R -> B -> D -> E
@@ -47,21 +45,21 @@ const index_js_2 = require("../../packages/verification/src/index.js");
         dag.addEdge('X', 'EVIDENCE', 'Y', 'CLAIM');
         const descendantsFromR = dag.getDescendants('R');
         // Completeness: all reachable nodes must be present
-        (0, vitest_1.expect)(descendantsFromR).toContain('A');
-        (0, vitest_1.expect)(descendantsFromR).toContain('B');
-        (0, vitest_1.expect)(descendantsFromR).toContain('C');
-        (0, vitest_1.expect)(descendantsFromR).toContain('D');
-        (0, vitest_1.expect)(descendantsFromR).toContain('E');
+        expect(descendantsFromR).toContain('A');
+        expect(descendantsFromR).toContain('B');
+        expect(descendantsFromR).toContain('C');
+        expect(descendantsFromR).toContain('D');
+        expect(descendantsFromR).toContain('E');
         // Soundness: unreachable nodes must NOT be present
-        (0, vitest_1.expect)(descendantsFromR).not.toContain('X');
-        (0, vitest_1.expect)(descendantsFromR).not.toContain('Y');
-        (0, vitest_1.expect)(descendantsFromR.length).toBe(5);
+        expect(descendantsFromR).not.toContain('X');
+        expect(descendantsFromR).not.toContain('Y');
+        expect(descendantsFromR.length).toBe(5);
     });
     /**
      * Property 4: Topological order never places a dependent before its affected prerequisite.
      */
-    (0, vitest_1.it)('Property 4: Invariant — Topological ordering strictly precedes dependents after prerequisites', () => {
-        const dag = new index_js_1.DependencyDAG();
+    it('Property 4: Invariant — Topological ordering strictly precedes dependents after prerequisites', () => {
+        const dag = new DependencyDAG();
         const edges = [
             ['R', 'A'],
             ['A', 'B'],
@@ -77,15 +75,15 @@ const index_js_2 = require("../../packages/verification/src/index.js");
         for (const [parent, child] of edges) {
             const parentIdx = order.indexOf(parent);
             const childIdx = order.indexOf(child);
-            (0, vitest_1.expect)(parentIdx).toBeLessThan(childIdx);
+            expect(parentIdx).toBeLessThan(childIdx);
         }
     });
     /**
      * Property 5: Idempotency: Applying the same change event twice produces
      * the exact same domain state as applying it once.
      */
-    (0, vitest_1.it)('Property 5: Invariant — Idempotency of repeated dependency-change events', () => {
-        const engine = new index_js_1.DependencyEngine();
+    it('Property 5: Invariant — Idempotency of repeated dependency-change events', () => {
+        const engine = new DependencyEngine();
         const rootEvId = 'evidence:root';
         const claim1Id = 'claim:c1';
         const claim2Id = 'claim:c2';
@@ -105,7 +103,7 @@ const index_js_2 = require("../../packages/verification/src/index.js");
             claim_type: 'EVENT_INCLUDED',
             subject_refs: ['event:1'],
             status: 'VERIFIED',
-            policy_id: index_js_2.POLICY_IDS.EVENT_INCLUSION,
+            policy_id: POLICY_IDS.EVENT_INCLUSION,
             policy_version: '1.0.0',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -117,7 +115,7 @@ const index_js_2 = require("../../packages/verification/src/index.js");
             claim_type: 'PATH_SUPPORTED',
             subject_refs: ['event:1'],
             status: 'VERIFIED',
-            policy_id: index_js_2.POLICY_IDS.PATH_SUPPORT,
+            policy_id: POLICY_IDS.PATH_SUPPORT,
             policy_version: '1.0.0',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -142,8 +140,8 @@ const index_js_2 = require("../../packages/verification/src/index.js");
         });
         // 1st application
         const prop1 = engine.onDependencyChanged(rootEvId, 'UPSTREAM_CHANGE');
-        (0, vitest_1.expect)(prop1.affectedCount).toBe(2);
-        (0, vitest_1.expect)(prop1.auditEventsCreated).toBe(2);
+        expect(prop1.affectedCount).toBe(2);
+        expect(prop1.auditEventsCreated).toBe(2);
         const snapshotAfter1st = {
             c1Status: engine.getClaim(claim1Id)?.status,
             c2Status: engine.getClaim(claim2Id)?.status,
@@ -151,19 +149,19 @@ const index_js_2 = require("../../packages/verification/src/index.js");
         };
         // 2nd application with identical trigger
         const prop2 = engine.onDependencyChanged(rootEvId, 'UPSTREAM_CHANGE');
-        (0, vitest_1.expect)(prop2.auditEventsCreated).toBe(0); // Deduplicated!
+        expect(prop2.auditEventsCreated).toBe(0); // Deduplicated!
         const snapshotAfter2nd = {
             c1Status: engine.getClaim(claim1Id)?.status,
             c2Status: engine.getClaim(claim2Id)?.status,
             auditLength: engine.getAllAuditEvents().length
         };
-        (0, vitest_1.expect)(snapshotAfter2nd).toEqual(snapshotAfter1st);
+        expect(snapshotAfter2nd).toEqual(snapshotAfter1st);
     });
     /**
      * Property 6: Revalidation never modifies claims outside the affected subgraph.
      */
-    (0, vitest_1.it)('Property 6: Invariant — Revalidation never modifies claims outside the affected subgraph', () => {
-        const engine = new index_js_1.DependencyEngine();
+    it('Property 6: Invariant — Revalidation never modifies claims outside the affected subgraph', () => {
+        const engine = new DependencyEngine();
         const rootEvId = 'evidence:root';
         const affectedClaimId = 'claim:affected';
         const independentClaimId = 'claim:independent';
@@ -183,7 +181,7 @@ const index_js_2 = require("../../packages/verification/src/index.js");
             claim_type: 'EVENT_INCLUDED',
             subject_refs: ['event:1'],
             status: 'VERIFIED',
-            policy_id: index_js_2.POLICY_IDS.EVENT_INCLUSION,
+            policy_id: POLICY_IDS.EVENT_INCLUSION,
             policy_version: '1.0.0',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -195,7 +193,7 @@ const index_js_2 = require("../../packages/verification/src/index.js");
             claim_type: 'DESTINATION_EXECUTED',
             subject_refs: ['event:independent'],
             status: 'VERIFIED',
-            policy_id: index_js_2.POLICY_IDS.EVENT_INCLUSION,
+            policy_id: POLICY_IDS.EVENT_INCLUSION,
             policy_version: '1.0.0',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -213,8 +211,8 @@ const index_js_2 = require("../../packages/verification/src/index.js");
         const independentBefore = { ...engine.getClaim(independentClaimId) };
         engine.onDependencyChanged(rootEvId, 'EVIDENCE_MODIFIED');
         const independentAfter = engine.getClaim(independentClaimId);
-        (0, vitest_1.expect)(independentAfter.status).toBe(independentBefore.status);
-        (0, vitest_1.expect)(independentAfter.version).toBe(independentBefore.version);
-        (0, vitest_1.expect)(independentAfter.updated_at).toBe(independentBefore.updated_at);
+        expect(independentAfter.status).toBe(independentBefore.status);
+        expect(independentAfter.version).toBe(independentBefore.version);
+        expect(independentAfter.updated_at).toBe(independentBefore.updated_at);
     });
 });

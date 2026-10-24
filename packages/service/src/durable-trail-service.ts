@@ -14,6 +14,14 @@ import {
   PersistedTrail,
   SqliteStore
 } from '../../persistence/src/index.js';
+import {
+  evaluateDestinationExecutionPolicy,
+  evaluateEventInclusionPolicy,
+  evaluateMessageMatchPolicy,
+  evaluatePathSupportPolicy,
+  evaluateSourceFinalityPolicy,
+  POLICY_IDS
+} from '../../verification/src/index.js';
 
 export interface DurableTrailResponse {
   schemaVersion: string;
@@ -63,7 +71,16 @@ export class DurableTrailService {
   ) {
     this.adapter = adapter;
     this.store = store;
-    this.engine = engine ?? new DependencyEngine();
+    if (engine) {
+      this.engine = engine;
+    } else {
+      this.engine = new DependencyEngine();
+      this.engine.registerPolicyEvaluator(POLICY_IDS.EVENT_INCLUSION, evaluateEventInclusionPolicy);
+      this.engine.registerPolicyEvaluator(POLICY_IDS.SOURCE_FINALITY, evaluateSourceFinalityPolicy);
+      this.engine.registerPolicyEvaluator(POLICY_IDS.MESSAGE_MATCH, evaluateMessageMatchPolicy);
+      this.engine.registerPolicyEvaluator(POLICY_IDS.DESTINATION_EXECUTION, evaluateDestinationExecutionPolicy);
+      this.engine.registerPolicyEvaluator(POLICY_IDS.PATH_SUPPORT, evaluatePathSupportPolicy);
+    }
   }
 
   /**

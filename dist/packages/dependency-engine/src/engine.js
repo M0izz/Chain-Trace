@@ -1,19 +1,14 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DependencyEngine = exports.DuplicateEdgeError = exports.CycleDetectedError = void 0;
-const index_js_1 = require("../../domain/src/index.js");
-const dag_js_1 = require("./dag.js");
-var dag_js_2 = require("./dag.js");
-Object.defineProperty(exports, "CycleDetectedError", { enumerable: true, get: function () { return dag_js_2.CycleDetectedError; } });
-Object.defineProperty(exports, "DuplicateEdgeError", { enumerable: true, get: function () { return dag_js_2.DuplicateEdgeError; } });
-class DependencyEngine {
+import { AppendOnlyAuditLog, DuplicateEdgeError, NotFoundError, PolicyNotFoundError, validateClaimRecord, validateDependencyEdge, validateEventRecord, validateEvidenceRecord, VersionConflictError } from '../../domain/src/index.js';
+import { DependencyDAG } from './dag.js';
+export { CycleDetectedError, DuplicateEdgeError } from './dag.js';
+export class DependencyEngine {
     events = new Map();
     evidence = new Map();
     claims = new Map();
     dependencies = new Map();
     claimDependencies = new Map(); // claimId -> dependencyIds
-    dag = new dag_js_1.DependencyDAG();
-    auditLog = new index_js_1.AppendOnlyAuditLog();
+    dag = new DependencyDAG();
+    auditLog = new AppendOnlyAuditLog();
     // Registry for policy evaluators
     evaluators = new Map();
     // Deduplication cache for dependency change triggers: `dependencyId:changeReason`
@@ -23,7 +18,7 @@ class DependencyEngine {
      * If already registered with the same event_id, returns existing record.
      */
     registerEvent(event) {
-        (0, index_js_1.validateEventRecord)(event);
+        validateEventRecord(event);
         const existing = this.events.get(event.event_id);
         if (existing) {
             return existing; // Idempotent return
@@ -36,7 +31,7 @@ class DependencyEngine {
      * Register or update an evidence record.
      */
     registerEvidence(evidence) {
-        (0, index_js_1.validateEvidenceRecord)(evidence);
+        validateEvidenceRecord(evidence);
         const cloned = Object.freeze({ ...evidence });
         const existing = this.evidence.get(evidence.evidence_id);
         this.evidence.set(evidence.evidence_id, cloned);
@@ -54,7 +49,7 @@ class DependencyEngine {
      * Register a new typed claim.
      */
     registerClaim(claim) {
-        (0, index_js_1.validateClaimRecord)(claim);
+        validateClaimRecord(claim);
         if (this.claims.has(claim.claim_id)) {
             return this.claims.get(claim.claim_id); // Idempotent
         }
@@ -83,14 +78,14 @@ class DependencyEngine {
      * Save / update a claim with optimistic concurrency control.
      */
     saveClaim(claim, expectedVersion) {
-        (0, index_js_1.validateClaimRecord)(claim);
+        validateClaimRecord(claim);
         const existing = this.claims.get(claim.claim_id);
         if (!existing) {
             return this.registerClaim(claim);
         }
         const curVer = existing.version ?? 1;
         if (expectedVersion !== undefined && curVer !== expectedVersion) {
-            throw new index_js_1.VersionConflictError(claim.claim_id, curVer, expectedVersion);
+            throw new VersionConflictError(claim.claim_id, curVer, expectedVersion);
         }
         const updated = {
             ...claim,
@@ -105,27 +100,27 @@ class DependencyEngine {
      * Cycle detection is strictly enforced; throwing CycleDetectedError on violation.
      */
     addDependency(edge, options) {
-        (0, index_js_1.validateDependencyEdge)(edge);
+        validateDependencyEdge(edge);
         if (this.dependencies.has(edge.dependency_id)) {
             if (options?.rejectDuplicate) {
-                throw new index_js_1.DuplicateEdgeError(edge.parent_id, edge.dependent_claim_id);
+                throw new DuplicateEdgeError(edge.parent_id, edge.dependent_claim_id);
             }
             return this.dependencies.get(edge.dependency_id); // Idempotent
         }
         if (options?.rejectDuplicate &&
             this.dag.hasEdge(edge.parent_id, edge.dependent_claim_id)) {
-            throw new index_js_1.DuplicateEdgeError(edge.parent_id, edge.dependent_claim_id);
+            throw new DuplicateEdgeError(edge.parent_id, edge.dependent_claim_id);
         }
         // Verify parent exists
         if (edge.parent_type === 'CLAIM' && !this.claims.has(edge.parent_id)) {
-            throw new index_js_1.NotFoundError('Claim', edge.parent_id);
+            throw new NotFoundError('Claim', edge.parent_id);
         }
         if (edge.parent_type === 'EVIDENCE' && !this.evidence.has(edge.parent_id)) {
-            throw new index_js_1.NotFoundError('Evidence', edge.parent_id);
+            throw new NotFoundError('Evidence', edge.parent_id);
         }
         // Verify dependent claim exists
         if (!this.claims.has(edge.dependent_claim_id)) {
-            throw new index_js_1.NotFoundError('Claim', edge.dependent_claim_id);
+            throw new NotFoundError('Claim', edge.dependent_claim_id);
         }
         // Add to DAG - will throw CycleDetectedError if cycle introduced
         this.dag.addEdge(edge.parent_id, edge.parent_type, edge.dependent_claim_id, 'CLAIM');
@@ -238,11 +233,11 @@ class DependencyEngine {
     async evaluateClaim(claimId) {
         const claim = this.claims.get(claimId);
         if (!claim) {
-            throw new index_js_1.NotFoundError('Claim', claimId);
+            throw new NotFoundError('Claim', claimId);
         }
         const evaluator = this.evaluators.get(claim.policy_id);
         if (!evaluator) {
-            throw new index_js_1.PolicyNotFoundError(claim.policy_id);
+            throw new PolicyNotFoundError(claim.policy_id);
         }
         // Gather dependencies
         const depIds = this.claimDependencies.get(claimId) || [];
@@ -439,4 +434,3 @@ class DependencyEngine {
         };
     }
 }
-exports.DependencyEngine = DependencyEngine;

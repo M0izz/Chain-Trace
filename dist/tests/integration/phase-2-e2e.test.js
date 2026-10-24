@@ -1,21 +1,19 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const vitest_1 = require("vitest");
-const index_js_1 = require("../../packages/chain-adapters/src/index.js");
-const index_js_2 = require("../../packages/dependency-engine/src/index.js");
-const index_js_3 = require("../../packages/verification/src/index.js");
-(0, vitest_1.describe)('Phase 2 — End-to-End Real Chain Integration (Section 2.5 & 2.6)', () => {
+import { describe, expect, it, beforeEach } from 'vitest';
+import { CrossChainTrailService, LAYERZERO_V2_SEPOLIA_AMOY_PROFILE, LayerZeroV2Adapter, ReadOnlyRpcClient } from '../../packages/chain-adapters/src/index.js';
+import { DependencyEngine } from '../../packages/dependency-engine/src/index.js';
+import { evaluateDestinationExecutionPolicy, evaluateEventInclusionPolicy, evaluateMessageMatchPolicy, evaluatePathSupportPolicy, evaluateSourceFinalityPolicy, POLICY_IDS } from '../../packages/verification/src/index.js';
+describe('Phase 2 — End-to-End Real Chain Integration (Section 2.5 & 2.6)', () => {
     const guid = '0x11223344556677889900aabbccddeeff11223344556677889900aabbccddeeff';
     const sourceTxHash = '0x9a8f4c2e6d1a8b3c5e7f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d';
     const destTxHash = '0x8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c';
     let engine;
-    (0, vitest_1.beforeEach)(() => {
-        engine = new index_js_2.DependencyEngine();
-        engine.registerPolicyEvaluator(index_js_3.POLICY_IDS.EVENT_INCLUSION, index_js_3.evaluateEventInclusionPolicy);
-        engine.registerPolicyEvaluator(index_js_3.POLICY_IDS.SOURCE_FINALITY, index_js_3.evaluateSourceFinalityPolicy);
-        engine.registerPolicyEvaluator(index_js_3.POLICY_IDS.MESSAGE_MATCH, index_js_3.evaluateMessageMatchPolicy);
-        engine.registerPolicyEvaluator(index_js_3.POLICY_IDS.DESTINATION_EXECUTION, index_js_3.evaluateDestinationExecutionPolicy);
-        engine.registerPolicyEvaluator(index_js_3.POLICY_IDS.PATH_SUPPORT, index_js_3.evaluatePathSupportPolicy);
+    beforeEach(() => {
+        engine = new DependencyEngine();
+        engine.registerPolicyEvaluator(POLICY_IDS.EVENT_INCLUSION, evaluateEventInclusionPolicy);
+        engine.registerPolicyEvaluator(POLICY_IDS.SOURCE_FINALITY, evaluateSourceFinalityPolicy);
+        engine.registerPolicyEvaluator(POLICY_IDS.MESSAGE_MATCH, evaluateMessageMatchPolicy);
+        engine.registerPolicyEvaluator(POLICY_IDS.DESTINATION_EXECUTION, evaluateDestinationExecutionPolicy);
+        engine.registerPolicyEvaluator(POLICY_IDS.PATH_SUPPORT, evaluatePathSupportPolicy);
     });
     function buildMockClients(options) {
         const rawData = '0x0000000000000000000000000000000000000000000000000000000000000060' +
@@ -52,8 +50,8 @@ const index_js_3 = require("../../packages/verification/src/index.js");
                         blockHash: '0xsource-block-hash-1',
                         logs: [
                             {
-                                address: index_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.sourceChain.endpointAddress,
-                                topics: [index_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetSentSignature],
+                                address: LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.sourceChain.endpointAddress,
+                                topics: [LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetSentSignature],
                                 data: rawData,
                                 blockNumber: '0x52b414',
                                 blockHash: '0xsource-block-hash-1',
@@ -109,9 +107,9 @@ const index_js_3 = require("../../packages/verification/src/index.js");
                         blockHash: '0xdest-block-hash',
                         logs: [
                             {
-                                address: index_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.destinationChain.endpointAddress,
+                                address: LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.destinationChain.endpointAddress,
                                 topics: [
-                                    index_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetDeliveredSignature,
+                                    LAYERZERO_V2_SEPOLIA_AMOY_PROFILE.events.packetDeliveredSignature,
                                     effectiveGuid,
                                     '0x00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c8',
                                     '0x0000000000000000000000003c44cdddb6a900fa2b585dd299e03d12fa4293bc'
@@ -136,84 +134,84 @@ const index_js_3 = require("../../packages/verification/src/index.js");
             }
             return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: null }), { status: 200 });
         };
-        const sourceRpc = new index_js_1.ReadOnlyRpcClient({ rpcUrl: 'https://sepolia-mock', expectedChainId: 11155111, fetchFn: sourceFetch });
-        const destinationRpc = new index_js_1.ReadOnlyRpcClient({ rpcUrl: 'https://amoy-mock', expectedChainId: 80002, fetchFn: destFetch });
-        return new index_js_1.LayerZeroV2Adapter({ sourceRpc, destinationRpc });
+        const sourceRpc = new ReadOnlyRpcClient({ rpcUrl: 'https://sepolia-mock', expectedChainId: 11155111, fetchFn: sourceFetch });
+        const destinationRpc = new ReadOnlyRpcClient({ rpcUrl: 'https://amoy-mock', expectedChainId: 80002, fetchFn: destFetch });
+        return new LayerZeroV2Adapter({ sourceRpc, destinationRpc });
     }
-    (0, vitest_1.it)('completes end-to-end trail where all 5 claims become VERIFIED', async () => {
+    it('completes end-to-end trail where all 5 claims become VERIFIED', async () => {
         const adapter = buildMockClients();
-        const service = new index_js_1.CrossChainTrailService(adapter, engine);
+        const service = new CrossChainTrailService(adapter, engine);
         const result = await service.ingestAndVerifyTrail({
             sourceTxHash,
             destTxHash
         });
-        (0, vitest_1.expect)(result.isComplete).toBe(true);
-        (0, vitest_1.expect)(result.statusSummary.sourceIncluded).toBe('VERIFIED');
-        (0, vitest_1.expect)(result.statusSummary.sourceFinalized).toBe('VERIFIED');
-        (0, vitest_1.expect)(result.statusSummary.messageMatched).toBe('VERIFIED');
-        (0, vitest_1.expect)(result.statusSummary.destinationExecuted).toBe('VERIFIED');
-        (0, vitest_1.expect)(result.statusSummary.pathSupported).toBe('VERIFIED');
+        expect(result.isComplete).toBe(true);
+        expect(result.statusSummary.sourceIncluded).toBe('VERIFIED');
+        expect(result.statusSummary.sourceFinalized).toBe('VERIFIED');
+        expect(result.statusSummary.messageMatched).toBe('VERIFIED');
+        expect(result.statusSummary.destinationExecuted).toBe('VERIFIED');
+        expect(result.statusSummary.pathSupported).toBe('VERIFIED');
         // Confirm full trail query returns all components
-        (0, vitest_1.expect)(result.trail.events.length).toBe(2);
-        (0, vitest_1.expect)(result.trail.claims.length).toBe(5);
-        (0, vitest_1.expect)(result.trail.evidence.length).toBeGreaterThanOrEqual(3);
+        expect(result.trail.events.length).toBe(2);
+        expect(result.trail.claims.length).toBe(5);
+        expect(result.trail.evidence.length).toBeGreaterThanOrEqual(3);
     });
-    (0, vitest_1.it)('handles inflight/unexecuted destination transaction with INCONCLUSIVE (never falsely invalid)', async () => {
+    it('handles inflight/unexecuted destination transaction with INCONCLUSIVE (never falsely invalid)', async () => {
         const adapter = buildMockClients({ delivered: false });
-        const service = new index_js_1.CrossChainTrailService(adapter, engine);
+        const service = new CrossChainTrailService(adapter, engine);
         const result = await service.ingestAndVerifyTrail({ sourceTxHash });
-        (0, vitest_1.expect)(result.isComplete).toBe(false);
-        (0, vitest_1.expect)(result.statusSummary.sourceIncluded).toBe('VERIFIED');
-        (0, vitest_1.expect)(result.statusSummary.sourceFinalized).toBe('VERIFIED');
+        expect(result.isComplete).toBe(false);
+        expect(result.statusSummary.sourceIncluded).toBe('VERIFIED');
+        expect(result.statusSummary.sourceFinalized).toBe('VERIFIED');
         // Destination execution is INCONCLUSIVE because it is inflight or not indexed yet
-        (0, vitest_1.expect)(result.statusSummary.destinationExecuted).toBe('INCONCLUSIVE');
-        (0, vitest_1.expect)(result.statusSummary.pathSupported).toBe('INCONCLUSIVE');
+        expect(result.statusSummary.destinationExecuted).toBe('INCONCLUSIVE');
+        expect(result.statusSummary.pathSupported).toBe('INCONCLUSIVE');
     });
-    (0, vitest_1.it)('detects source block reorg and marks affected claims REVALIDATION_REQUIRED while preserving destination fact', async () => {
+    it('detects source block reorg and marks affected claims REVALIDATION_REQUIRED while preserving destination fact', async () => {
         const reorgNewHash = '0xNEW_CANONICAL_BLOCK_HASH_AFTER_REORG';
         const adapter = buildMockClients({ reorgNewHash });
-        const service = new index_js_1.CrossChainTrailService(adapter, engine);
+        const service = new CrossChainTrailService(adapter, engine);
         // Initial happy path
         await service.ingestAndVerifyTrail({ sourceTxHash, destTxHash });
         const destExecClaimBefore = engine.getClaim(`claim:80002:dest-exec:${guid}`);
-        (0, vitest_1.expect)(destExecClaimBefore.status).toBe('VERIFIED');
+        expect(destExecClaimBefore.status).toBe('VERIFIED');
         // Check source reorg at block 5420100 (0x52b414)
         const reorgDetected = await service.checkSourceReorg(0x52b414);
-        (0, vitest_1.expect)(reorgDetected).toBe(true);
+        expect(reorgDetected).toBe(true);
         // Dependent claims must be marked REVALIDATION_REQUIRED
         const srcFinalized = engine.getClaim(`claim:11155111:finalized:${sourceTxHash.toLowerCase()}`);
         const msgMatch = engine.getClaim(`claim:lz2:match:${guid}`);
         const pathClaim = engine.getClaim(`claim:lz2:path:${guid}`);
-        (0, vitest_1.expect)(srcFinalized.status).toBe('REVALIDATION_REQUIRED');
-        (0, vitest_1.expect)(msgMatch.status).toBe('REVALIDATION_REQUIRED');
-        (0, vitest_1.expect)(pathClaim.status).toBe('REVALIDATION_REQUIRED');
+        expect(srcFinalized.status).toBe('REVALIDATION_REQUIRED');
+        expect(msgMatch.status).toBe('REVALIDATION_REQUIRED');
+        expect(pathClaim.status).toBe('REVALIDATION_REQUIRED');
         // Independent destination execution fact remains PRESERVED in status VERIFIED!
         const destExecClaimAfter = engine.getClaim(`claim:80002:dest-exec:${guid}`);
-        (0, vitest_1.expect)(destExecClaimAfter.status).toBe('VERIFIED');
+        expect(destExecClaimAfter.status).toBe('VERIFIED');
     });
-    (0, vitest_1.it)('ensures ingestion is idempotent: repeated polling creates 0 duplicate claims or audit transitions', async () => {
+    it('ensures ingestion is idempotent: repeated polling creates 0 duplicate claims or audit transitions', async () => {
         const adapter = buildMockClients();
-        const service = new index_js_1.CrossChainTrailService(adapter, engine);
+        const service = new CrossChainTrailService(adapter, engine);
         const initial = await service.ingestAndVerifyTrail({ sourceTxHash, destTxHash });
         const initialStats = engine.getGraphStats();
         // Re-ingest exact same transaction trail
         const second = await service.ingestAndVerifyTrail({ sourceTxHash, destTxHash });
         const afterStats = engine.getGraphStats();
-        (0, vitest_1.expect)(initial.isComplete).toBe(true);
-        (0, vitest_1.expect)(second.isComplete).toBe(true);
-        (0, vitest_1.expect)(afterStats.totalClaims).toBe(initialStats.totalClaims);
-        (0, vitest_1.expect)(afterStats.totalEdges).toBe(initialStats.totalEdges);
-        (0, vitest_1.expect)(afterStats.totalEvents).toBe(initialStats.totalEvents);
+        expect(initial.isComplete).toBe(true);
+        expect(second.isComplete).toBe(true);
+        expect(afterStats.totalClaims).toBe(initialStats.totalClaims);
+        expect(afterStats.totalEdges).toBe(initialStats.totalEdges);
+        expect(afterStats.totalEvents).toBe(initialStats.totalEvents);
     });
-    (0, vitest_1.it)('rejects mismatched message GUID with INVALID status and failure reason', async () => {
+    it('rejects mismatched message GUID with INVALID status and failure reason', async () => {
         const mismatchedGuid = '0x9999999999999999999999999999999999999999999999999999999999999999';
         const adapter = buildMockClients({ mismatchGuid: mismatchedGuid });
-        const service = new index_js_1.CrossChainTrailService(adapter, engine);
+        const service = new CrossChainTrailService(adapter, engine);
         const result = await service.ingestAndVerifyTrail({ sourceTxHash, destTxHash });
-        (0, vitest_1.expect)(result.statusSummary.messageMatched).toBe('INVALID');
-        (0, vitest_1.expect)(result.statusSummary.pathSupported).toBe('INVALID');
-        (0, vitest_1.expect)(result.isComplete).toBe(false);
+        expect(result.statusSummary.messageMatched).toBe('INVALID');
+        expect(result.statusSummary.pathSupported).toBe('INVALID');
+        expect(result.isComplete).toBe(false);
         const msgClaim = engine.getClaim(`claim:lz2:match:${guid}`);
-        (0, vitest_1.expect)(msgClaim.status_reason.code).toBe('MESSAGE_ID_MISMATCH');
+        expect(msgClaim.status_reason.code).toBe('MESSAGE_ID_MISMATCH');
     });
 });

@@ -1,14 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DependencyDAG = exports.DuplicateEdgeError = exports.CycleDetectedError = void 0;
-const index_js_1 = require("../../domain/src/index.js");
-Object.defineProperty(exports, "CycleDetectedError", { enumerable: true, get: function () { return index_js_1.CycleDetectedError; } });
-Object.defineProperty(exports, "DuplicateEdgeError", { enumerable: true, get: function () { return index_js_1.DuplicateEdgeError; } });
+import { CycleDetectedError, DuplicateEdgeError } from '../../domain/src/index.js';
+export { CycleDetectedError, DuplicateEdgeError };
 /**
  * Directed Acyclic Graph (DAG) for Claim and Evidence Dependencies.
  * Edges point from PREREQUISITE (parent) -> DEPENDENT (child/claim).
  */
-class DependencyDAG {
+export class DependencyDAG {
     // Map of node ID to outgoing neighbors (dependents)
     adjacencyList = new Map();
     // Map of node ID to incoming neighbors (parents / prerequisites)
@@ -46,13 +42,13 @@ class DependencyDAG {
         this.addNode(dependentId, dependentType);
         // Direct self-dependency cycle
         if (parentId === dependentId) {
-            throw new index_js_1.CycleDetectedError([parentId, dependentId]);
+            throw new CycleDetectedError([parentId, dependentId]);
         }
         // Check if adding parentId -> dependentId would create a cycle.
         // A cycle occurs if parentId is already reachable from dependentId.
         const pathFromDependentToParent = this.findPath(dependentId, parentId);
         if (pathFromDependentToParent.length > 0) {
-            throw new index_js_1.CycleDetectedError([...pathFromDependentToParent, dependentId]);
+            throw new CycleDetectedError([...pathFromDependentToParent, dependentId]);
         }
         this.adjacencyList.get(parentId).add(dependentId);
         this.reverseAdjacencyList.get(dependentId).add(parentId);
@@ -241,4 +237,3 @@ class DependencyDAG {
         return count;
     }
 }
-exports.DependencyDAG = DependencyDAG;

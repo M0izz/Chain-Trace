@@ -1,20 +1,17 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LayerZeroV2Adapter = void 0;
-const decoder_js_1 = require("./decoder.js");
-const errors_js_1 = require("./errors.js");
-const profile_js_1 = require("./profile.js");
+import { decodePacketDelivered, decodePacketSent } from './decoder.js';
+import { ReceiptNotSuccessfulError, TransactionNotFoundError } from './errors.js';
+import { computeContentHash, LAYERZERO_V2_SEPOLIA_AMOY_PROFILE } from './profile.js';
 /**
  * LayerZero v2 Cross-Chain Protocol Adapter (Sepolia -> Polygon Amoy)
  */
-class LayerZeroV2Adapter {
+export class LayerZeroV2Adapter {
     sourceRpc;
     destinationRpc;
     profile;
     constructor(options) {
         this.sourceRpc = options.sourceRpc;
         this.destinationRpc = options.destinationRpc;
-        this.profile = options.profile ?? profile_js_1.LAYERZERO_V2_SEPOLIA_AMOY_PROFILE;
+        this.profile = options.profile ?? LAYERZERO_V2_SEPOLIA_AMOY_PROFILE;
     }
     /**
      * Fetches, validates, and decodes source chain evidence from a transaction hash.
@@ -22,14 +19,14 @@ class LayerZeroV2Adapter {
     async getSourceEvidence(sourceTxHash) {
         const tx = await this.sourceRpc.getTransactionByHash(sourceTxHash);
         if (!tx) {
-            throw new errors_js_1.TransactionNotFoundError(sourceTxHash);
+            throw new TransactionNotFoundError(sourceTxHash);
         }
         const receipt = await this.sourceRpc.getTransactionReceipt(sourceTxHash);
         if (!receipt) {
-            throw new errors_js_1.TransactionNotFoundError(sourceTxHash);
+            throw new TransactionNotFoundError(sourceTxHash);
         }
         if (receipt.status !== 1) {
-            throw new errors_js_1.ReceiptNotSuccessfulError(sourceTxHash, receipt.status);
+            throw new ReceiptNotSuccessfulError(sourceTxHash, receipt.status);
         }
         const block = await this.sourceRpc.getBlockByHash(receipt.blockHash);
         if (!block) {
@@ -43,7 +40,7 @@ class LayerZeroV2Adapter {
         if (!matchingLog) {
             throw new Error(`Transaction ${sourceTxHash} did not emit PacketSent event on EndpointV2 (${expectedEndpoint})`);
         }
-        const decodedPacket = (0, decoder_js_1.decodePacketSent)(matchingLog);
+        const decodedPacket = decodePacketSent(matchingLog);
         // Compute confirmations
         const latestBlock = await this.sourceRpc.getBlockByNumber('latest');
         const confirmationCount = latestBlock ? latestBlock.number - block.number : 0;
@@ -72,7 +69,7 @@ class LayerZeroV2Adapter {
             evidence_id: `evidence:${this.profile.sourceChain.chainId}:receipt:${sourceTxHash.toLowerCase()}`,
             evidence_type: 'RECEIPT_REFERENCE',
             subject_ref: sourceEventId,
-            content_hash: (0, profile_js_1.computeContentHash)({
+            content_hash: computeContentHash({
                 txHash: sourceTxHash,
                 blockHash: block.hash,
                 status: receipt.status,
@@ -93,7 +90,7 @@ class LayerZeroV2Adapter {
             evidence_id: `evidence:${this.profile.sourceChain.chainId}:finality:${block.hash}`,
             evidence_type: 'AUTHENTICATED_HEADER',
             subject_ref: sourceEventId,
-            content_hash: (0, profile_js_1.computeContentHash)({
+            content_hash: computeContentHash({
                 blockHash: block.hash,
                 confirmationCount,
                 threshold: this.profile.sourceChain.finalityBlocks
@@ -149,7 +146,7 @@ class LayerZeroV2Adapter {
                 const otherDeliveredLog = receipt.logs.find((l) => l.address.toLowerCase() === expectedEndpoint &&
                     l.topics[0]?.toLowerCase() === packetDeliveredSig);
                 if (otherDeliveredLog) {
-                    const otherDecoded = (0, decoder_js_1.decodePacketDelivered)(otherDeliveredLog);
+                    const otherDecoded = decodePacketDelivered(otherDeliveredLog);
                     return {
                         status: 'MISMATCH',
                         decodedPacket: otherDecoded,
@@ -161,7 +158,7 @@ class LayerZeroV2Adapter {
                     reason: `Destination transaction did not deliver packet with GUID ${params.guid}`
                 };
             }
-            const decoded = (0, decoder_js_1.decodePacketDelivered)(matchingLog);
+            const decoded = decodePacketDelivered(matchingLog);
             const destEventId = `event:${this.profile.destinationChain.chainId}:${params.destTxHash.toLowerCase()}:${matchingLog.logIndex}`;
             const destEvent = {
                 event_id: destEventId,
@@ -183,7 +180,7 @@ class LayerZeroV2Adapter {
                 evidence_id: `evidence:${this.profile.destinationChain.chainId}:receipt:${params.destTxHash.toLowerCase()}`,
                 evidence_type: 'RECEIPT_REFERENCE',
                 subject_ref: destEventId,
-                content_hash: (0, profile_js_1.computeContentHash)({
+                content_hash: computeContentHash({
                     txHash: params.destTxHash,
                     blockHash: receipt.blockHash,
                     status: receipt.status
@@ -233,4 +230,3 @@ class LayerZeroV2Adapter {
         });
     }
 }
-exports.LayerZeroV2Adapter = LayerZeroV2Adapter;

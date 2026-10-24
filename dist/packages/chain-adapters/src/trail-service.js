@@ -1,20 +1,17 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CrossChainTrailService = void 0;
-const index_js_1 = require("../../dependency-engine/src/index.js");
-const profile_js_1 = require("./profile.js");
+import { DependencyEngine } from '../../dependency-engine/src/index.js';
+import { computeContentHash } from './profile.js';
 /**
  * Cross-Chain Trail Service
  * Connects protocol adapter evidence to the Phase 1 DependencyEngine.
  */
-class CrossChainTrailService {
+export class CrossChainTrailService {
     adapter;
     engine;
     // Track observed block hashes at heights for reorg detection
     observedBlockHashes = new Map();
     constructor(adapter, engine) {
         this.adapter = adapter;
-        this.engine = engine ?? new index_js_1.DependencyEngine();
+        this.engine = engine ?? new DependencyEngine();
     }
     /**
      * Ingests, normalizes, and verifies a cross-chain execution trail from a source transaction hash.
@@ -92,7 +89,7 @@ class CrossChainTrailService {
             evidence_id: attestationEvidenceId,
             evidence_type: 'MESSAGE_ATTESTATION',
             subject_ref: decodedPacket.guid,
-            content_hash: (0, profile_js_1.computeContentHash)(decodedPacket),
+            content_hash: computeContentHash(decodedPacket),
             source_reference: `layerzero://${decodedPacket.srcEid}->${decodedPacket.dstEid}/${decodedPacket.guid}`,
             verification_method: 'LayerZeroV2PacketHeaderVerification',
             policy_version: this.adapter.profile.policyVersion,
@@ -254,4 +251,3 @@ class CrossChainTrailService {
         return false;
     }
 }
-exports.CrossChainTrailService = CrossChainTrailService;

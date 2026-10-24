@@ -141,6 +141,8 @@ chaintrace/
 │       └── phase-1-report.md            # Phase 1 exit gate report & test results
 │   └── phase-2/                         # Phase 2 Real Chain Integration
 │       └── phase-2-report.md            # Phase 2 implementation report & acceptance
+│   └── phase-3/                         # Phase 3 Persistence, API & Auditability
+│       └── phase-3-report.md            # Phase 3 implementation report & acceptance
 ├── packages/
 │   ├── domain/                          # Domain models, schemas & audit trail
 │   │   └── src/
@@ -159,29 +161,87 @@ chaintrace/
 │   │   └── src/
 │   │       ├── policies.ts              # Event inclusion, finality, message match policies
 │   │       └── index.ts                 # Verification exports
-│   └── chain-adapters/                  # Phase 2 Real-World Protocol Adapters
+│   ├── chain-adapters/                  # Phase 2 Real-World Protocol Adapters
+│   │   └── src/
+│   │       ├── profile.ts               # LayerZero v2 profile (Sepolia -> Polygon Amoy)
+│   │       ├── rpc-client.ts            # ReadOnlyRpcClient with retry, timeout & 429 backoff
+│   │       ├── decoder.ts               # PacketSent & PacketDelivered ABI decoders
+│   │       ├── adapter.ts               # LayerZeroV2Adapter source/dest evidence collection
+│   │       ├── trail-service.ts         # CrossChainTrailService (connects adapter to DAG engine)
+│   │       ├── errors.ts                # Typed RPC & adapter error classes
+│   │       └── index.ts                 # Chain adapters exports
+│   ├── persistence/                     # Phase 3 Relational Persistence
+│   │   └── src/
+│   │       ├── schema.sql               # ANSI SQL schema (trails, claims, evidence, audit)
+│   │       ├── migrator.ts              # Schema migrator with version tracking
+│   │       ├── sqlite-store.ts          # SQLite store with transactions, OCC & pagination
+│   │       └── index.ts                 # Persistence exports
+│   ├── service/                         # Phase 3 Durable Service Layer
+│   │   └── src/
+│   │       ├── durable-trail-service.ts # Orchestrates live ingestion, caching & atomic writes
+│   │       └── index.ts                 # Service exports
+│   └── api/                             # Phase 3 Fastify REST API
 │       └── src/
-│           ├── profile.ts               # LayerZero v2 profile (Sepolia -> Polygon Amoy)
-│           ├── rpc-client.ts            # ReadOnlyRpcClient with retry, timeout & 429 backoff
-│           ├── decoder.ts               # PacketSent & PacketDelivered ABI decoders
-│           ├── adapter.ts               # LayerZeroV2Adapter source/dest evidence collection
-│           ├── trail-service.ts         # CrossChainTrailService (connects adapter to DAG engine)
-│           ├── errors.ts                # Typed RPC & adapter error classes
-│           └── index.ts                 # Chain adapters exports
+│           ├── server.ts                # Fastify server, validation, auth guard, rate limits
+│           └── index.ts                 # API exports
 └── tests/
-    ├── fixtures/
-    │   └── deterministic-trail.ts       # Source -> MessageMatch -> Dest trail fixtures
-    ├── unit/
-    │   ├── dag.test.ts                  # DAG cycle detection & topological ordering tests
-    │   └── revalidation.test.ts         # Subtree revalidation, recovery & audit stress tests
-    └── acceptance.test.ts               # Acceptance suite for T01 - T12
+    ├── acceptance.test.ts               # Phase 1 Acceptance suite for T01 - T12
+    ├── adapters/                        # Phase 2 RPC, Decoder & Adapter tests
+    ├── integration/                     # Phase 2 Real chain end-to-end integration tests
+    ├── persistence/                     # Phase 3 SQLite migrations, OCC & restart tests
+    ├── api/                             # Phase 3 Fastify HTTP endpoints & auth tests
+    ├── unit/                            # DAG cycle detection & fault injection tests
+    └── property/                        # Graph property-based invariant tests
 ```
 
 ---
 
-## 7. Audit Log Cryptographic Integrity
+## 7. Phase 3 REST API & Persistence
 
-Audit records are not just named "audit"—they are enforced as an append-only hash chain:
-- Each event calculates a SHA-256 digest over its sequence number, timestamp, previous record hash (`prev_hash`), and transition details.
-- `AppendOnlyAuditLog.verifyChainIntegrity()` mathematically validates the unbroken hash chain across all recorded transitions.
-- Queries return frozen objects (`Object.freeze`) to prevent in-memory tampering.
+Phase 3 exposes a versioned, narrow, and predictable Fastify REST API:
+
+### Endpoints
+
+| Endpoint | Access | Description |
+|---|---|---|
+| `GET /health` | Public | Operational liveness probe |
+| `GET /ready` | Public | Dependency readiness probe |
+| `GET /v1/trails/:sourceChainId/:sourceTxHash` | Public | Retrieves complete trail graph; serves from cache or ingests live |
+| `GET /v1/claims/:claimId` | Public | Inspects individual claim status, reason code, and policy version |
+| `GET /v1/evidence/:evidenceId` | Public | Retrieves evidence record, provider, and raw observation payload |
+| `GET /v1/trails/:trailId/audit` | Public | Retrieves paginated append-only audit trail (`limit`, `offset`) |
+| `POST /v1/trails/:trailId/refresh` | Authenticated | Re-evaluates trail against fresh RPC state (rate-limited, idempotent) |
+
+### Mutation Protection & Security
+- **Authentication**: `POST /v1/trails/:trailId/refresh` requires `x-api-key`.
+- **Idempotency**: Clients supply an `idempotency-key` header to cache and deduplicate expensive refresh requests.
+- **Rate Limiting**: Refreshes are bound to 5 requests/minute per trail ID.
+- **Input Validation**: Rejects non-hex tx hashes and invalid chain IDs with 400 Bad Request before hitting storage or RPC.
+
+---
+
+## 8. Verification & Test Commands
+
+```bash
+# Typecheck entire TypeScript codebase
+npm run typecheck
+
+# Run Phase 1 unit & acceptance tests
+npm run test:unit
+npm run test:integration
+
+# Run Phase 2 adapter tests
+npm run test:adapters
+
+# Run Phase 3 persistence tests (SQLite migrations, OCC, restart survival)
+npm run test:persistence
+
+# Run Phase 3 Fastify REST API tests (auth, validation, endpoints, rate limits)
+npm run test:api
+
+# Run entire test suite (65 passing tests)
+npm test
+
+# Build production bundle
+npm run build
+```

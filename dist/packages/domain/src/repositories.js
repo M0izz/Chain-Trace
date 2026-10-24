@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.InMemoryEvidenceRepository = exports.InMemoryAuditRepository = exports.InMemoryDependencyRepository = exports.InMemoryClaimRepository = void 0;
-const errors_js_1 = require("./errors.js");
-class InMemoryClaimRepository {
+import { VersionConflictError } from './errors.js';
+export class InMemoryClaimRepository {
     store = new Map();
     async getById(id) {
         const claim = this.store.get(id);
@@ -12,7 +9,7 @@ class InMemoryClaimRepository {
         const existing = this.store.get(claim.claim_id);
         const curVer = existing ? (existing.version ?? 1) : 1;
         if (existing && expectedVersion !== undefined && curVer !== expectedVersion) {
-            throw new errors_js_1.VersionConflictError(claim.claim_id, curVer, expectedVersion);
+            throw new VersionConflictError(claim.claim_id, curVer, expectedVersion);
         }
         const nextVersion = existing ? curVer + 1 : (claim.version ?? 1);
         this.store.set(claim.claim_id, {
@@ -34,8 +31,7 @@ class InMemoryClaimRepository {
         return Array.from(this.store.values()).map((c) => ({ ...c }));
     }
 }
-exports.InMemoryClaimRepository = InMemoryClaimRepository;
-class InMemoryDependencyRepository {
+export class InMemoryDependencyRepository {
     store = new Map();
     async add(edge) {
         this.store.set(edge.dependency_id, { ...edge });
@@ -65,8 +61,7 @@ class InMemoryDependencyRepository {
         return Array.from(this.store.values()).map((e) => ({ ...e }));
     }
 }
-exports.InMemoryDependencyRepository = InMemoryDependencyRepository;
-class InMemoryAuditRepository {
+export class InMemoryAuditRepository {
     store = [];
     async append(event) {
         this.store.push(Object.freeze({ ...event }));
@@ -80,8 +75,7 @@ class InMemoryAuditRepository {
         return this.store.map((ev) => ({ ...ev }));
     }
 }
-exports.InMemoryAuditRepository = InMemoryAuditRepository;
-class InMemoryEvidenceRepository {
+export class InMemoryEvidenceRepository {
     store = new Map();
     async getById(id) {
         const ev = this.store.get(id);
@@ -94,4 +88,3 @@ class InMemoryEvidenceRepository {
         return Array.from(this.store.values()).map((e) => ({ ...e }));
     }
 }
-exports.InMemoryEvidenceRepository = InMemoryEvidenceRepository;

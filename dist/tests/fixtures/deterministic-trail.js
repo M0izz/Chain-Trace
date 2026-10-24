@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FIXTURE_DEPENDENCY_EDGES = exports.FIXTURE_CLAIM_PATH_SUPPORTED = exports.FIXTURE_CLAIM_DEST_EXECUTED = exports.FIXTURE_CLAIM_MESSAGE_MATCH = exports.FIXTURE_CLAIM_SOURCE_FINALIZED = exports.FIXTURE_CLAIM_SOURCE_INCLUDED = exports.FIXTURE_EVIDENCE_DEST_EXEC = exports.FIXTURE_EVIDENCE_ATTESTATION = exports.FIXTURE_EVIDENCE_FINALITY = exports.FIXTURE_EVIDENCE_INCLUSION = exports.FIXTURE_DEST_EVENT = exports.FIXTURE_SOURCE_EVENT = void 0;
-const index_js_1 = require("../../packages/verification/src/index.js");
-exports.FIXTURE_SOURCE_EVENT = {
+import { POLICY_IDS } from '../../packages/verification/src/index.js';
+export const FIXTURE_SOURCE_EVENT = {
     event_id: 'event:11155111:0x9a8f4c2e6d1a8b3c5e7f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d:2',
     chain_id: 11155111,
     tx_hash: '0x9a8f4c2e6d1a8b3c5e7f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d',
@@ -19,7 +16,7 @@ exports.FIXTURE_SOURCE_EVENT = {
         amount: '1000000000000000000'
     }
 };
-exports.FIXTURE_DEST_EVENT = {
+export const FIXTURE_DEST_EVENT = {
     event_id: 'event:80002:0x8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c:1',
     chain_id: 80002,
     tx_hash: '0x8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c',
@@ -35,10 +32,10 @@ exports.FIXTURE_DEST_EVENT = {
         amount: '1000000000000000000'
     }
 };
-exports.FIXTURE_EVIDENCE_INCLUSION = {
+export const FIXTURE_EVIDENCE_INCLUSION = {
     evidence_id: 'evidence:eth:inclusion:001',
     evidence_type: 'INCLUSION_PROOF',
-    subject_ref: exports.FIXTURE_SOURCE_EVENT.event_id,
+    subject_ref: FIXTURE_SOURCE_EVENT.event_id,
     content_hash: '0xabc123789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0',
     source_reference: 'rpc://sepolia.infura.io/v3/proof',
     verification_method: 'MerkleReceiptProof',
@@ -46,10 +43,10 @@ exports.FIXTURE_EVIDENCE_INCLUSION = {
     result: 'PASS',
     checked_at: '2026-10-24T12:01:00.000Z'
 };
-exports.FIXTURE_EVIDENCE_FINALITY = {
+export const FIXTURE_EVIDENCE_FINALITY = {
     evidence_id: 'evidence:eth:finality:001',
     evidence_type: 'AUTHENTICATED_HEADER',
-    subject_ref: exports.FIXTURE_SOURCE_EVENT.event_id,
+    subject_ref: FIXTURE_SOURCE_EVENT.event_id,
     content_hash: '0xbbb123789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0',
     source_reference: 'rpc://sepolia.beacon-api/finalized_header',
     verification_method: 'CasperFFGFinality',
@@ -57,7 +54,7 @@ exports.FIXTURE_EVIDENCE_FINALITY = {
     result: 'PASS',
     checked_at: '2026-10-24T12:02:00.000Z'
 };
-exports.FIXTURE_EVIDENCE_ATTESTATION = {
+export const FIXTURE_EVIDENCE_ATTESTATION = {
     evidence_id: 'evidence:bridge:attestation:001',
     evidence_type: 'MESSAGE_ATTESTATION',
     subject_ref: 'claim:message-match:001',
@@ -68,10 +65,10 @@ exports.FIXTURE_EVIDENCE_ATTESTATION = {
     result: 'PASS',
     checked_at: '2026-10-24T12:03:00.000Z'
 };
-exports.FIXTURE_EVIDENCE_DEST_EXEC = {
+export const FIXTURE_EVIDENCE_DEST_EXEC = {
     evidence_id: 'evidence:polygon:exec:001',
     evidence_type: 'RECEIPT_REFERENCE',
-    subject_ref: exports.FIXTURE_DEST_EVENT.event_id,
+    subject_ref: FIXTURE_DEST_EVENT.event_id,
     content_hash: '0xddd123789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0',
     source_reference: 'rpc://amoy.polygon.technology/receipt',
     verification_method: 'ReceiptStatusCheck',
@@ -79,12 +76,12 @@ exports.FIXTURE_EVIDENCE_DEST_EXEC = {
     result: 'PASS',
     checked_at: '2026-10-24T12:06:00.000Z'
 };
-exports.FIXTURE_CLAIM_SOURCE_INCLUDED = {
+export const FIXTURE_CLAIM_SOURCE_INCLUDED = {
     claim_id: 'claim:source-included:001',
     claim_type: 'EVENT_INCLUDED',
-    subject_refs: [exports.FIXTURE_SOURCE_EVENT.event_id],
+    subject_refs: [FIXTURE_SOURCE_EVENT.event_id],
     status: 'UNVERIFIED',
-    policy_id: index_js_1.POLICY_IDS.EVENT_INCLUSION,
+    policy_id: POLICY_IDS.EVENT_INCLUSION,
     policy_version: '1.0.0',
     created_at: '2026-10-24T12:01:30.000Z',
     updated_at: '2026-10-24T12:01:30.000Z',
@@ -93,12 +90,12 @@ exports.FIXTURE_CLAIM_SOURCE_INCLUDED = {
         message: 'Claim registered and awaiting initial evaluation'
     }
 };
-exports.FIXTURE_CLAIM_SOURCE_FINALIZED = {
+export const FIXTURE_CLAIM_SOURCE_FINALIZED = {
     claim_id: 'claim:source-finalized:001',
     claim_type: 'SOURCE_FINALIZED',
-    subject_refs: [exports.FIXTURE_SOURCE_EVENT.event_id],
+    subject_refs: [FIXTURE_SOURCE_EVENT.event_id],
     status: 'UNVERIFIED',
-    policy_id: index_js_1.POLICY_IDS.SOURCE_FINALITY,
+    policy_id: POLICY_IDS.SOURCE_FINALITY,
     policy_version: '1.0.0',
     created_at: '2026-10-24T12:02:30.000Z',
     updated_at: '2026-10-24T12:02:30.000Z',
@@ -107,12 +104,12 @@ exports.FIXTURE_CLAIM_SOURCE_FINALIZED = {
         message: 'Claim registered and awaiting source finality evaluation'
     }
 };
-exports.FIXTURE_CLAIM_MESSAGE_MATCH = {
+export const FIXTURE_CLAIM_MESSAGE_MATCH = {
     claim_id: 'claim:message-match:001',
     claim_type: 'MESSAGE_MATCHED',
-    subject_refs: [exports.FIXTURE_SOURCE_EVENT.event_id, exports.FIXTURE_DEST_EVENT.event_id],
+    subject_refs: [FIXTURE_SOURCE_EVENT.event_id, FIXTURE_DEST_EVENT.event_id],
     status: 'UNVERIFIED',
-    policy_id: index_js_1.POLICY_IDS.MESSAGE_MATCH,
+    policy_id: POLICY_IDS.MESSAGE_MATCH,
     policy_version: '1.0.0',
     created_at: '2026-10-24T12:03:30.000Z',
     updated_at: '2026-10-24T12:03:30.000Z',
@@ -125,12 +122,12 @@ exports.FIXTURE_CLAIM_MESSAGE_MATCH = {
         destination_message_id: '0xmsg-eth-pol-001'
     }
 };
-exports.FIXTURE_CLAIM_DEST_EXECUTED = {
+export const FIXTURE_CLAIM_DEST_EXECUTED = {
     claim_id: 'claim:dest-executed:001',
     claim_type: 'DESTINATION_EXECUTED',
-    subject_refs: [exports.FIXTURE_DEST_EVENT.event_id],
+    subject_refs: [FIXTURE_DEST_EVENT.event_id],
     status: 'UNVERIFIED',
-    policy_id: index_js_1.POLICY_IDS.DESTINATION_EXECUTION,
+    policy_id: POLICY_IDS.DESTINATION_EXECUTION,
     policy_version: '1.0.0',
     created_at: '2026-10-24T12:06:30.000Z',
     updated_at: '2026-10-24T12:06:30.000Z',
@@ -139,15 +136,15 @@ exports.FIXTURE_CLAIM_DEST_EXECUTED = {
         message: 'Destination execution observation awaiting verification'
     }
 };
-exports.FIXTURE_CLAIM_PATH_SUPPORTED = {
+export const FIXTURE_CLAIM_PATH_SUPPORTED = {
     claim_id: 'claim:path-supported:001',
     claim_type: 'PATH_SUPPORTED',
     subject_refs: [
-        exports.FIXTURE_SOURCE_EVENT.event_id,
-        exports.FIXTURE_DEST_EVENT.event_id
+        FIXTURE_SOURCE_EVENT.event_id,
+        FIXTURE_DEST_EVENT.event_id
     ],
     status: 'UNVERIFIED',
-    policy_id: index_js_1.POLICY_IDS.PATH_SUPPORT,
+    policy_id: POLICY_IDS.PATH_SUPPORT,
     policy_version: '1.0.0',
     created_at: '2026-10-24T12:07:00.000Z',
     updated_at: '2026-10-24T12:07:00.000Z',
@@ -156,13 +153,13 @@ exports.FIXTURE_CLAIM_PATH_SUPPORTED = {
         message: 'Full path claim registered and awaiting evaluation'
     }
 };
-exports.FIXTURE_DEPENDENCY_EDGES = [
+export const FIXTURE_DEPENDENCY_EDGES = [
     // Inclusion proof -> Source included claim
     {
         dependency_id: 'dep:inc-proof->src-inc',
         parent_type: 'EVIDENCE',
-        parent_id: exports.FIXTURE_EVIDENCE_INCLUSION.evidence_id,
-        dependent_claim_id: exports.FIXTURE_CLAIM_SOURCE_INCLUDED.claim_id,
+        parent_id: FIXTURE_EVIDENCE_INCLUSION.evidence_id,
+        dependent_claim_id: FIXTURE_CLAIM_SOURCE_INCLUDED.claim_id,
         dependency_type: 'SUPPORTS',
         required: true
     },
@@ -170,8 +167,8 @@ exports.FIXTURE_DEPENDENCY_EDGES = [
     {
         dependency_id: 'dep:src-inc->src-fin',
         parent_type: 'CLAIM',
-        parent_id: exports.FIXTURE_CLAIM_SOURCE_INCLUDED.claim_id,
-        dependent_claim_id: exports.FIXTURE_CLAIM_SOURCE_FINALIZED.claim_id,
+        parent_id: FIXTURE_CLAIM_SOURCE_INCLUDED.claim_id,
+        dependent_claim_id: FIXTURE_CLAIM_SOURCE_FINALIZED.claim_id,
         dependency_type: 'SUPPORTS',
         required: true
     },
@@ -179,8 +176,8 @@ exports.FIXTURE_DEPENDENCY_EDGES = [
     {
         dependency_id: 'dep:fin-ev->src-fin',
         parent_type: 'EVIDENCE',
-        parent_id: exports.FIXTURE_EVIDENCE_FINALITY.evidence_id,
-        dependent_claim_id: exports.FIXTURE_CLAIM_SOURCE_FINALIZED.claim_id,
+        parent_id: FIXTURE_EVIDENCE_FINALITY.evidence_id,
+        dependent_claim_id: FIXTURE_CLAIM_SOURCE_FINALIZED.claim_id,
         dependency_type: 'FINALITY_GUARD',
         required: true
     },
@@ -188,8 +185,8 @@ exports.FIXTURE_DEPENDENCY_EDGES = [
     {
         dependency_id: 'dep:src-fin->msg-match',
         parent_type: 'CLAIM',
-        parent_id: exports.FIXTURE_CLAIM_SOURCE_FINALIZED.claim_id,
-        dependent_claim_id: exports.FIXTURE_CLAIM_MESSAGE_MATCH.claim_id,
+        parent_id: FIXTURE_CLAIM_SOURCE_FINALIZED.claim_id,
+        dependent_claim_id: FIXTURE_CLAIM_MESSAGE_MATCH.claim_id,
         dependency_type: 'SUPPORTS',
         required: true
     },
@@ -197,8 +194,8 @@ exports.FIXTURE_DEPENDENCY_EDGES = [
     {
         dependency_id: 'dep:attest->msg-match',
         parent_type: 'EVIDENCE',
-        parent_id: exports.FIXTURE_EVIDENCE_ATTESTATION.evidence_id,
-        dependent_claim_id: exports.FIXTURE_CLAIM_MESSAGE_MATCH.claim_id,
+        parent_id: FIXTURE_EVIDENCE_ATTESTATION.evidence_id,
+        dependent_claim_id: FIXTURE_CLAIM_MESSAGE_MATCH.claim_id,
         dependency_type: 'AUTHENTICATES',
         required: true
     },
@@ -206,8 +203,8 @@ exports.FIXTURE_DEPENDENCY_EDGES = [
     {
         dependency_id: 'dep:dest-ev->dest-exec',
         parent_type: 'EVIDENCE',
-        parent_id: exports.FIXTURE_EVIDENCE_DEST_EXEC.evidence_id,
-        dependent_claim_id: exports.FIXTURE_CLAIM_DEST_EXECUTED.claim_id,
+        parent_id: FIXTURE_EVIDENCE_DEST_EXEC.evidence_id,
+        dependent_claim_id: FIXTURE_CLAIM_DEST_EXECUTED.claim_id,
         dependency_type: 'SUPPORTS',
         required: true
     },
@@ -215,8 +212,8 @@ exports.FIXTURE_DEPENDENCY_EDGES = [
     {
         dependency_id: 'dep:msg-match->path',
         parent_type: 'CLAIM',
-        parent_id: exports.FIXTURE_CLAIM_MESSAGE_MATCH.claim_id,
-        dependent_claim_id: exports.FIXTURE_CLAIM_PATH_SUPPORTED.claim_id,
+        parent_id: FIXTURE_CLAIM_MESSAGE_MATCH.claim_id,
+        dependent_claim_id: FIXTURE_CLAIM_PATH_SUPPORTED.claim_id,
         dependency_type: 'MATCHES',
         required: true
     },
@@ -224,8 +221,8 @@ exports.FIXTURE_DEPENDENCY_EDGES = [
     {
         dependency_id: 'dep:dest-exec->path',
         parent_type: 'CLAIM',
-        parent_id: exports.FIXTURE_CLAIM_DEST_EXECUTED.claim_id,
-        dependent_claim_id: exports.FIXTURE_CLAIM_PATH_SUPPORTED.claim_id,
+        parent_id: FIXTURE_CLAIM_DEST_EXECUTED.claim_id,
+        dependent_claim_id: FIXTURE_CLAIM_PATH_SUPPORTED.claim_id,
         dependency_type: 'SUPPORTS',
         required: true
     }

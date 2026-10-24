@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ReadOnlyRpcClient = void 0;
-const errors_js_1 = require("./errors.js");
+import { ChainIdMismatchError, RpcClientError, RpcRateLimitError, RpcTimeoutError } from './errors.js';
 /**
  * Read-Only JSON-RPC 2.0 Client with validation, retries, and timeout controls.
  */
-class ReadOnlyRpcClient {
+export class ReadOnlyRpcClient {
     rpcUrl;
     expectedChainId;
     timeoutMs;
@@ -43,7 +40,7 @@ class ReadOnlyRpcClient {
                 });
                 clearTimeout(timeoutId);
                 if (response.status === 429) {
-                    throw new errors_js_1.RpcRateLimitError(this.rpcUrl);
+                    throw new RpcRateLimitError(this.rpcUrl);
                 }
                 if (!response.ok) {
                     if (response.status >= 500 && attempt < this.maxRetries) {
@@ -51,19 +48,19 @@ class ReadOnlyRpcClient {
                         await this.sleep(this.backoffBaseMs * Math.pow(2, attempt));
                         continue;
                     }
-                    throw new errors_js_1.RpcClientError('HTTP_ERROR', `RPC server returned status ${response.status}: ${response.statusText}`);
+                    throw new RpcClientError('HTTP_ERROR', `RPC server returned status ${response.status}: ${response.statusText}`);
                 }
                 const data = (await response.json());
                 if (data.error) {
-                    throw new errors_js_1.RpcClientError('RPC_ERROR', data.error.message);
+                    throw new RpcClientError('RPC_ERROR', data.error.message);
                 }
                 return data.result;
             }
             catch (err) {
                 clearTimeout(timeoutId);
-                if (err instanceof errors_js_1.RpcClientError) {
+                if (err instanceof RpcClientError) {
                     // If rate limited or unrecoverable client error, don't spin endlessly
-                    if (err instanceof errors_js_1.RpcRateLimitError && attempt < this.maxRetries) {
+                    if (err instanceof RpcRateLimitError && attempt < this.maxRetries) {
                         attempt++;
                         await this.sleep(this.backoffBaseMs * Math.pow(2, attempt) * 2);
                         continue;
@@ -76,17 +73,17 @@ class ReadOnlyRpcClient {
                         await this.sleep(this.backoffBaseMs * Math.pow(2, attempt));
                         continue;
                     }
-                    throw new errors_js_1.RpcTimeoutError(method, this.timeoutMs);
+                    throw new RpcTimeoutError(method, this.timeoutMs);
                 }
                 if (attempt < this.maxRetries) {
                     attempt++;
                     await this.sleep(this.backoffBaseMs * Math.pow(2, attempt));
                     continue;
                 }
-                throw new errors_js_1.RpcClientError('NETWORK_FAILURE', err instanceof Error ? err.message : String(err));
+                throw new RpcClientError('NETWORK_FAILURE', err instanceof Error ? err.message : String(err));
             }
         }
-        throw new errors_js_1.RpcClientError('MAX_RETRIES_EXCEEDED', `Failed after ${this.maxRetries} retries`);
+        throw new RpcClientError('MAX_RETRIES_EXCEEDED', `Failed after ${this.maxRetries} retries`);
     }
     /**
      * Validates that the connected RPC matches the configured chain ID.
@@ -95,7 +92,7 @@ class ReadOnlyRpcClient {
         const hexChainId = await this.call('eth_chainId');
         const actualChainId = parseInt(hexChainId, 16);
         if (actualChainId !== this.expectedChainId) {
-            throw new errors_js_1.ChainIdMismatchError(this.expectedChainId, actualChainId);
+            throw new ChainIdMismatchError(this.expectedChainId, actualChainId);
         }
         this.verifiedChainId = true;
         return actualChainId;
@@ -204,4 +201,3 @@ class ReadOnlyRpcClient {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 }
-exports.ReadOnlyRpcClient = ReadOnlyRpcClient;
