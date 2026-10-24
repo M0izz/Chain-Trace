@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChainTrace — Verifiable Cross-Chain Trail Explorer & Evidence Inspector</title>
+  <meta name="description" content="Explainable, evidence-backed cross-chain verification explorer with dependency DAGs, tamper-evident audit trails, and revalidation tracking.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body class="theme-dark">
+  <!-- Top Navigation Header -->
+  <header class="app-header" role="banner">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <rect width="28" height="28" rx="8" fill="url(#brandGrad)" />
+            <path d="M7 14L12 9L17 14L22 9" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 19L12 14L17 19L22 14" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.8"/>
+            <defs>
+              <linearGradient id="brandGrad" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#00f2fe"/>
+                <stop offset="1" stop-color="#4facfe"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title-row">
+            <h1 class="brand-title">ChainTrace</h1>
+            <span class="badge badge-subtle">Phase 4 Explorer</span>
+          </div>
+          <p class="brand-subtitle">Evidence-backed cross-chain verification & dependency graph</p>
+        </div>
+      </div>
+
+      <div class="header-meta">
+        <div class="network-badge-pair" title="Supported Protocol Profile">
+          <span class="net-pill sep"><span class="dot"></span> Sepolia (11155111)</span>
+          <span class="net-arrow" aria-hidden="true">➔</span>
+          <span class="net-pill amoy"><span class="dot"></span> Amoy (80002)</span>
+        </div>
+        <button id="aboutTrustBtn" class="btn btn-secondary btn-sm" aria-haspopup="dialog" aria-expanded="false">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          Trust Model
+        </button>
+        <div class="api-status-badge" id="apiStatusBadge">
+          <span class="status-indicator"></span>
+          <span class="status-text">API Online</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <main class="main-container" id="mainContent" role="main">
+    <!-- Lookup & Scenario Bar -->
+    <section class="card lookup-section" aria-label="Transaction Lookup">
+      <div class="lookup-form-row">
+        <div class="form-group chain-group">
+          <label for="chainSelect" class="form-label">Source Chain</label>
+          <select id="chainSelect" class="form-select">
+            <option value="11155111" selected>Ethereum Sepolia (11155111)</option>
+          </select>
+        </div>
+
+        <div class="form-group tx-group">
+          <label for="txInput" class="form-label">Source Transaction Hash</label>
+          <div class="input-with-action">
+            <input
+              type="text"
+              id="txInput"
+              class="form-input mono"
+              placeholder="0x9a8f4c2e6d1a8b3c5e7f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d"
+              value="0x9a8f4c2e6d1a8b3c5e7f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d"
+              spellcheck="false"
+              autocomplete="off"
+              aria-describedby="txValidationMsg"
+            />
+            <button id="clearTxBtn" class="input-clear-btn" title="Clear input" aria-label="Clear transaction hash">&times;</button>
+          </div>
+          <div id="txValidationMsg" class="form-feedback" aria-live="polite"></div>
+        </div>
+
+        <div class="form-group action-group">
+          <label class="form-label">&nbsp;</label>
+          <button id="inspectBtn" class="btn btn-primary" type="button">
+            <span class="btn-spinner" aria-hidden="true"></span>
+            <span class="btn-label">Inspect Trail</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Demo Scenario Selectors -->
+      <div class="scenario-bar">
+        <span class="scenario-label">Reproducible Demo Scenarios:</span>
+        <div class="scenario-buttons" role="group" aria-label="Demo Scenarios">
+          <button class="pill-btn active" data-scenario="successful-trail" title="Load live verified Sepolia -> Amoy trail">
+            <span class="badge-indicator pass"></span> 1. Verified Trail
+          </button>
+          <button class="pill-btn" data-scenario="message-mismatch" title="Simulate contradictory message GUIDs">
+            <span class="badge-indicator fail"></span> 2. Message Mismatch [FIXTURE]
+          </button>
+          <button class="pill-btn" data-scenario="evidence-unavailable" title="Simulate pending destination log indexing">
+            <span class="badge-indicator inconcl"></span> 3. Inflight Inconclusive [FIXTURE]
+          </button>
+          <button class="pill-btn" data-scenario="dependency-change" title="Simulate upstream block reorganization and revalidation">
+            <span class="badge-indicator reval"></span> 4. Upstream Reorg [FIXTURE]
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trail Notification & Error Banner -->
+    <div id="alertBanner" class="alert-banner" role="alert" style="display: none;">
+      <div class="alert-icon" id="alertIcon"></div>
+      <div class="alert-content">
+        <h4 id="alertTitle" class="alert-title"></h4>
+        <p id="alertMessage" class="alert-desc"></p>
+      </div>
+      <button id="alertCloseBtn" class="alert-close" aria-label="Close notification">&times;</button>
+    </div>
+
+    <!-- Active Fixture Mode Banner -->
+    <div id="fixtureBanner" class="fixture-banner" style="display: none;" role="note">
+      <span class="fixture-tag">DEMO FIXTURE MODE</span>
+      <span>This trail is an explicitly labeled demo scenario for controlled state machine evaluation. It is not presented as live chain data.</span>
+    </div>
+
+    <!-- Trail Overview Section -->
+    <section id="trailOverviewCard" class="card trail-overview-card" aria-label="Trail Summary">
+      <div class="overview-header">
+        <div class="trail-id-container">
+          <span class="meta-label">TRAIL IDENTIFIER</span>
+          <div class="copyable-row">
+            <span id="trailIdDisplay" class="mono trail-id-text">Loading...</span>
+            <button id="copyTrailIdBtn" class="icon-btn" title="Copy Trail ID" aria-label="Copy Trail ID">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="overview-status-container">
+          <span class="meta-label">OVERALL STATUS</span>
+          <div id="overallStatusBadge" class="status-badge-lg status-unverified">
+            <span class="status-icon" aria-hidden="true">●</span>
+            <span id="overallStatusText" class="status-label">UNVERIFIED</span>
+          </div>
+        </div>
+
+        <div class="overview-actions">
+          <button id="refreshBtn" class="btn btn-secondary btn-sm" title="Re-evaluate trail against fresh RPC state">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Revalidate Trail
+          </button>
+        </div>
+      </div>
+
+      <!-- Linear Pipeline Progress -->
+      <div class="pipeline-flow" aria-label="Execution Flow">
+        <div class="flow-step" id="stepSrc">
+          <div class="step-num">1</div>
+          <div class="step-info">
+            <span class="step-title">Source Tx</span>
+            <span id="stepSrcHash" class="step-hash mono">0x...</span>
+          </div>
+        </div>
+        <div class="flow-divider" aria-hidden="true">➔</div>
+        <div class="flow-step" id="stepPkt">
+          <div class="step-num">2</div>
+          <div class="step-info">
+            <span class="step-title">PacketSent</span>
+            <span id="stepPktGuid" class="step-hash mono">LayerZero v2</span>
+          </div>
+        </div>
+        <div class="flow-divider" aria-hidden="true">➔</div>
+        <div class="flow-step" id="stepDest">
+          <div class="step-num">3</div>
+          <div class="step-info">
+            <span class="step-title">Destination Execution</span>
+            <span id="stepDestHash" class="step-hash mono">Pending/Confirmed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust Caveats & Provenance -->
+      <div class="caveats-row">
+        <div class="trust-notice">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span id="trustCaveatsText">Trust Model: Direct RPC receipts & 12-block finality assumed authoritative.</span>
+        </div>
+        <div class="provenance-meta">
+          <span>Evaluated: <strong id="lastEvaluatedDisplay" class="mono">Just now</strong></span>
+          <span class="sep">•</span>
+          <span>Storage: <strong id="storageSourceDisplay">SQLite Database</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Workspace Grid: Left Graph & Right Inspector -->
+    <div class="workspace-grid">
+      <!-- Left Column: Dependency DAG & Claims Trail -->
+      <section class="card graph-column" aria-label="Claim Dependency Graph">
+        <div class="column-header">
+          <div class="header-left">
+            <h2 class="section-title">Claim Dependency Graph</h2>
+            <span id="claimCountBadge" class="count-badge">4 claims</span>
+          </div>
+          <div class="view-toggle" role="radiogroup" aria-label="Graph View Mode">
+            <button id="viewDagBtn" class="toggle-btn active" role="radio" aria-checked="true">Directed DAG</button>
+            <button id="viewListBtn" class="toggle-btn" role="radio" aria-checked="false">Accessible List</button>
+          </div>
+        </div>
+
+        <!-- DAG Container -->
+        <div id="dagContainer" class="dag-container" tabindex="0" aria-label="Interactive Claim Dependency Graph">
+          <svg id="dagSvg" class="dag-svg" width="100%" height="420" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#4a5568"/>
+              </marker>
+              <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#00f2fe"/>
+              </marker>
+            </defs>
+            <g id="dagEdges" class="edges-layer"></g>
+            <g id="dagNodes" class="nodes-layer"></g>
+          </svg>
+          <div class="dag-hint">Click any node to inspect prerequisites & dependent claims. Selected edges reveal relationship types.</div>
+        </div>
+
+        <!-- Accessible List Alternative -->
+        <div id="accessibleListContainer" class="list-container" style="display: none;">
+          <ul id="claimsListFallback" class="claims-list-fallback" role="list"></ul>
+        </div>
+
+        <!-- Edge Inspector Card (when relationship selected) -->
+        <div id="edgeDetailCard" class="edge-detail-card" style="display: none;">
+          <div class="edge-title-row">
+            <span class="meta-label">RELATIONSHIP EDGE</span>
+            <span id="edgeTypeBadge" class="badge badge-accent">AUTHENTICATES</span>
+          </div>
+          <p id="edgeExplanation" class="edge-explanation-text"></p>
+        </div>
+
+        <!-- Affected Descendants View (Revalidation scenario) -->
+        <div id="revalidationImpactCard" class="reval-impact-card" style="display: none;">
+          <h3 class="impact-title">Revalidation Impact Analysis</h3>
+          <p class="impact-desc">When upstream evidence changes, ChainTrace isolates invalidation strictly to downstream dependents:</p>
+          <div class="impact-columns">
+            <div class="impact-col affected">
+              <span class="col-head">Affected Claims (Require Revalidation)</span>
+              <ul id="affectedClaimsList" class="impact-list"></ul>
+            </div>
+            <div class="impact-col unaffected">
+              <span class="col-head">Unaffected Independent Facts</span>
+              <ul id="unaffectedClaimsList" class="impact-list"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Detail Inspector (Claims, Evidence, Audit) -->
+      <section class="card inspector-column" aria-label="Investigation Inspector">
+        <!-- Inspector Tabs -->
+        <div class="tab-bar" role="tablist">
+          <button id="tabClaimBtn" class="tab-btn active" role="tab" aria-selected="true" aria-controls="claimTabPanel">
+            Claim Inspector
+          </button>
+          <button id="tabEvidenceBtn" class="tab-btn" role="tab" aria-selected="false" aria-controls="evidenceTabPanel">
+            Evidence Inspector <span id="evCountBadge" class="badge badge-subtle">2</span>
+          </button>
+          <button id="tabAuditBtn" class="tab-btn" role="tab" aria-selected="false" aria-controls="auditTabPanel">
+            Audit Timeline <span id="auditCountBadge" class="badge badge-subtle">1</span>
+          </button>
+        </div>
+
+        <!-- Panel 1: Claim Inspector -->
+        <div id="claimTabPanel" class="tab-panel active" role="tabpanel" aria-labelledby="tabClaimBtn">
+          <div class="panel-section">
+            <div class="section-row-between">
+              <div>
+                <span class="meta-label">SELECTED CLAIM</span>
+                <h3 id="claimNameDisplay" class="claim-title-lg">Select a claim to inspect</h3>
+              </div>
+              <div id="claimStatusBadge" class="status-badge-md status-unverified">UNVERIFIED</div>
+            </div>
+            <div class="copyable-row">
+              <span id="claimIdDisplay" class="mono text-muted text-sm">claim:...</span>
+              <button id="copyClaimIdBtn" class="icon-btn" title="Copy Claim ID" aria-label="Copy Claim ID">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <span class="meta-label">STATUS REASON & EXPLANATION</span>
+            <div id="claimReasonBox" class="reason-callout">
+              <div id="claimReasonCode" class="reason-code mono">CODE_PENDING</div>
+              <p id="claimReasonMsg" class="reason-text">Select a claim node on the left to inspect its verification output and reason codes.</p>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <span class="meta-label">POLICY & PROVENANCE</span>
+            <div class="kv-grid">
+              <div class="kv-item">
+                <span class="kv-key">Policy Identifier</span>
+                <span id="claimPolicyId" class="kv-val mono">-</span>
+              </div>
+              <div class="kv-item">
+                <span class="kv-key">Policy Version</span>
+                <span id="claimPolicyVer" class="kv-val mono">-</span>
+              </div>
+              <div class="kv-item">
+                <span class="kv-key">Claim Version (OCC)</span>
+                <span id="claimVersion" class="kv-val mono">v1</span>
+              </div>
+              <div class="kv-item">
+                <span class="kv-key">Last Verified</span>
+                <span id="claimVerifiedAt" class="kv-val mono">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <span class="meta-label">SUPPORTING EVIDENCE REFERENCES</span>
+            <div id="claimEvidenceRefs" class="ref-pills-container">
+              <span class="text-muted text-sm">No evidence loaded.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Evidence Inspector -->
+        <div id="evidenceTabPanel" class="tab-panel" role="tabpanel" aria-labelledby="tabEvidenceBtn" style="display: none;">
+          <div class="panel-section">
+            <span class="meta-label">AVAILABLE EVIDENCE RECORDS</span>
+            <div id="evidenceSelectorList" class="evidence-selector-list"></div>
+          </div>
+
+          <div id="evidenceDetailArea" class="evidence-detail-area">
+            <div class="section-row-between">
+              <div>
+                <span class="meta-label">EVIDENCE RECORD</span>
+                <h4 id="evTypeDisplay" class="ev-title">RECEIPT_REFERENCE</h4>
+              </div>
+              <span id="evResultBadge" class="badge badge-pass">PASS</span>
+            </div>
+
+            <div class="kv-grid mt-sm">
+              <div class="kv-item">
+                <span class="kv-key">Verification Method</span>
+                <span id="evMethodDisplay" class="kv-val mono">DIRECT_RPC</span>
+              </div>
+              <div class="kv-item">
+                <span class="kv-key">Evaluation Time</span>
+                <span id="evTimestampDisplay" class="kv-val mono">-</span>
+              </div>
+              <div class="kv-item full-width">
+                <span class="kv-key">Provider / Source Locator</span>
+                <span id="evProviderDisplay" class="kv-val mono">-</span>
+              </div>
+              <div class="kv-item full-width">
+                <span class="kv-key">Content Hash (SHA-256)</span>
+                <div class="copyable-row">
+                  <span id="evHashDisplay" class="kv-val mono text-sm truncate">-</span>
+                  <button id="copyEvHashBtn" class="icon-btn" title="Copy Content Hash" aria-label="Copy Content Hash">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-section mt-sm">
+              <div class="section-row-between">
+                <span class="meta-label">NORMALIZED OBSERVATION PAYLOAD</span>
+                <button id="toggleRawPayloadBtn" class="btn btn-subtle btn-xs">View Raw JSON</button>
+              </div>
+              <pre id="evPayloadDisplay" class="code-block mono text-xs">{}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 3: Audit Timeline -->
+        <div id="auditTabPanel" class="tab-panel" role="tabpanel" aria-labelledby="tabAuditBtn" style="display: none;">
+          <div class="panel-section">
+            <div class="section-row-between">
+              <div>
+                <span class="meta-label">APPEND-ONLY AUDIT HISTORY</span>
+                <p class="text-sm text-muted">Cryptographically chained transitions explaining each state change.</p>
+              </div>
+              <div class="audit-pagination-controls">
+                <button id="auditPrevBtn" class="btn btn-secondary btn-xs" disabled>&larr; Newer</button>
+                <span id="auditPageDisplay" class="text-xs text-muted">1 of 1</span>
+                <button id="auditNextBtn" class="btn btn-secondary btn-xs" disabled>Older &rarr;</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="auditTimelineContainer" class="audit-timeline-container">
+            <div id="auditTimelineList" class="audit-timeline"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Revalidate Confirmation & API Key Modal -->
+  <dialog id="refreshModal" class="app-modal" aria-labelledby="modalTitle">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTitle" class="modal-title">Trigger Trail Revalidation</h3>
+        <button id="closeModalBtn" class="modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          State-mutating refreshes re-query live RPC nodes, check for block reorganizations, and update the persistent SQLite store.
+        </p>
+        <div class="form-group mt-sm">
+          <label for="apiKeyInput" class="form-label">API Key (x-api-key)</label>
+          <input type="password" id="apiKeyInput" class="form-input mono" placeholder="Enter API Key (default: test-api-key)" value="phase3-secret-key" />
+          <span class="form-help">Mutations require authentication to protect against unauthenticated global refresh storms.</span>
+        </div>
+        <div class="form-group mt-sm">
+          <label class="checkbox-label">
+            <input type="checkbox" id="checkReorgBox" checked />
+            <span>Enable block reorganization check</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelRefreshBtn" class="btn btn-secondary">Cancel</button>
+        <button id="confirmRefreshBtn" class="btn btn-primary">Execute Revalidation</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Trust Model & Verification Boundaries Modal -->
+  <dialog id="trustModal" class="app-modal" aria-labelledby="trustModalTitle">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <h3 id="trustModalTitle" class="modal-title">Verification Boundaries & Trust Assumptions</h3>
+        <button id="closeTrustModalBtn" class="modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="trust-rule-card">
+          <h4>1. Explain, Don't Decorate</h4>
+          <p>Every visual status maps directly to a deterministic policy rule (`policy:event-inclusion`, `policy:source-finality`, `policy:message-match`, `policy:destination-execution`). No status is inferred or fabricated on the client.</p>
+        </div>
+        <div class="trust-rule-card mt-sm">
+          <h4>2. Truthful State Semantics</h4>
+          <p><strong>INCONCLUSIVE</strong> means evidence is incomplete or pending (e.g. inflight packet), never fraud. <strong>REVALIDATION_REQUIRED</strong> indicates upstream evidence reorganization without erasing historical facts.</p>
+        </div>
+        <div class="trust-rule-card mt-sm">
+          <h4>3. Protocol Assumptions (LayerZero v2)</h4>
+          <p>Direct RPC receipts on Sepolia and Polygon Amoy are trusted for receipt status and emitted topics. DVN quorum threshold signatures are assumed valid if emitted by EndpointV2.</p>
+        </div>
+        <div class="trust-rule-card mt-sm">
+          <h4>4. Append-Only Tamper Evidence</h4>
+          <p>All state transitions are appended with SHA-256 hash chains (`prev_hash` &rarr; `record_hash`). The database prevents updates or deletes of historical audit rows.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="dismissTrustModalBtn" class="btn btn-primary">Understood</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="/assets/app.js"></script>
+</body>
+</html>

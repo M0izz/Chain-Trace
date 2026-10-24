@@ -1,6 +1,12 @@
 import fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { randomUUID } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { DurableTrailService } from '../../service/src/durable-trail-service.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export interface ApiServerOptions {
   service: DurableTrailService;
@@ -207,6 +213,44 @@ export function buildApiServer(options: ApiServerOptions): FastifyInstance {
       }
     }
   );
+
+  // --------------------------------------------------------------------------
+  // Phase 4 Static UI Explorer Routes
+  // --------------------------------------------------------------------------
+  const publicDir = [
+    resolve(process.cwd(), 'packages', 'ui', 'public'),
+    resolve(__dirname, '..', '..', 'ui', 'public'),
+    resolve(__dirname, '..', '..', '..', 'packages', 'ui', 'public')
+  ].find((d) => existsSync(d));
+
+  if (publicDir) {
+    app.get('/', async (_req: FastifyRequest, reply: FastifyReply) => {
+      const htmlPath = join(publicDir, 'index.html');
+      if (existsSync(htmlPath)) {
+        const html = readFileSync(htmlPath, 'utf-8');
+        return reply.type('text/html').send(html);
+      }
+      return reply.status(404).send('UI index.html not found');
+    });
+
+    app.get('/assets/styles.css', async (_req: FastifyRequest, reply: FastifyReply) => {
+      const cssPath = join(publicDir, 'styles.css');
+      if (existsSync(cssPath)) {
+        const css = readFileSync(cssPath, 'utf-8');
+        return reply.type('text/css').send(css);
+      }
+      return reply.status(404).send('styles.css not found');
+    });
+
+    app.get('/assets/app.js', async (_req: FastifyRequest, reply: FastifyReply) => {
+      const jsPath = join(publicDir, 'app.js');
+      if (existsSync(jsPath)) {
+        const js = readFileSync(jsPath, 'utf-8');
+        return reply.type('application/javascript').send(js);
+      }
+      return reply.status(404).send('app.js not found');
+    });
+  }
 
   return app;
 }

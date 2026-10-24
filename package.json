@@ -13,6 +13,7 @@
     "test:adapters": "vitest run tests/adapters",
     "test:persistence": "vitest run tests/persistence",
     "test:api": "vitest run tests/api",
+    "test:ui": "vitest run tests/ui",
     "test:integration": "vitest run tests/acceptance.test.ts tests/integration",
     "test:live": "vitest run tests/live",
     "test:watch": "vitest",
@@ -33,6 +34,7 @@
     "vitest": "^2.1.8"
   },
   "dependencies": {
+    "@fastify/static": "^10.1.7",
     "fastify": "^5.12.7"
   }
 }
